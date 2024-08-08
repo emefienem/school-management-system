@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Admin {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  password   String
+  role       String    @default("Admin")
+  schoolName String    @unique
+  teachers   Teacher[]
+  students   Student[]
+  parents    Parent[]
+  subjects   Subject[]
+  sclasses   Sclass[]
+}
+
+model Teacher {
+  id              Int            @id @default(autoincrement())
+  name            String
+  email           String         @unique
+  password        String
+  role            String         @default("Teacher")
+  school          Admin          @relation(fields: [schoolId], references: [id])
+  teachSubjectId  Int?           @unique
+  teachSubject    Subject?       @relation(fields: [teachSubjectId], references: [id])
+  schoolId        Int
+  teachSclass     Sclass         @relation("TeacherSclass", fields: [teachSclassId], references: [id])
+  teachSclassId   Int
+  attendance      Attendance[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model Attendance {
+  id            Int       @id @default(autoincrement())
+  teacher       Teacher   @relation(fields: [teacherId], references: [id])
+  teacherId     Int
+  date          DateTime
+  presentCount  String?
+  absentCount   String?
+  student       Student   @relation(fields: [studentId], references: [id])
+  studentId     Int
+  status        String
+  subName       Subject    @relation(fields: [subNameId], references: [id])
+  subNameId     Int
+}
+
+model Subject {
+  id            Int        @id @default(autoincrement())
+  subName       String
+  subCode       String
+  sessions      String
+  sclass        Sclass     @relation(fields: [sclassId], references: [id])
+  sclassId      Int
+  school        Admin      @relation(fields: [schoolId], references: [id])
+  schoolId      Int
+  teacher       Teacher?   
+  teacherId     Int?
+  examResults   ExamResult[]
+  attendances   Attendance[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Sclass {
+  id          Int        @id @default(autoincrement())
+  sclassName  String
+  school      Admin      @relation(fields: [schoolId], references: [id])
+  schoolId    Int
+  teachers    Teacher[]  @relation("TeacherSclass")
+  students    Student[]
+  subjects    Subject[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Student {
+  id          Int          @id @default(autoincrement())
+  name        String
+  rollNum     Int
+  password    String
+  sclass      Sclass       @relation(fields: [sclassId], references: [id])
+  sclassId    Int
+  school      Admin        @relation(fields: [schoolId], references: [id])
+  schoolId    Int
+  role        String       @default("Student")
+  examResults ExamResult[]
+  attendance  Attendance[]
+  parent      Parent?      @relation(fields: [parentId], references: [id])
+  parentId    Int?
+  fees        Fee[]
+  disabled    Boolean      @default(false)
+}
+
+model ExamResult {
+  id            Int       @id @default(autoincrement())
+  student       Student   @relation(fields: [studentId], references: [id])
+  studentId     Int
+  subName       Subject    @relation(fields: [subNameId], references: [id])
+  subNameId     Int
+  marksObtained Int        @default(0)
+}
+
+model Parent {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  password   String
+  role       String    @default("Parent")
+  school     Admin     @relation(fields: [schoolId], references: [id])
+  schoolId   Int
+  children   Student[]
+  fees       Fee[]
+}
+
+model Fee {
+  id          Int      @id @default(autoincrement())
+  student     Student  @relation(fields: [studentId], references: [id])
+  studentId   Int
+  term        String   
+  amount      Float
+  isPaid      Boolean  @default(false)
+  paymentDate DateTime?
+  parent      Parent?  @relation(fields: [parentId], references: [id])
+  parentId    Int?
+}
