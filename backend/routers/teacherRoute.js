@@ -6,7 +6,7 @@ router.post("/register", teacherCtrl.teacherRegister);
 router.post("/login", teacherCtrl.teacherLogin);
 
 router.get("/get-all-teachers/:id", teacherCtrl.getTeachers);
-router.get("/get-details/:id", teacherCtrl.getTeacherDetail);
+router.get("/infor/:id", teacherCtrl.getTeacherDetail);
 
 router.delete("/delete-many-teachers/:id", teacherCtrl.deleteTeachers);
 router.delete("/teachers-by-class/:id", teacherCtrl.deleteTeachersByClass);

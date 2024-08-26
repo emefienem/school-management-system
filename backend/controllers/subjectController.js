@@ -9,7 +9,7 @@ const subjectCtrl = {
         subName: subject.subName,
         subCode: subject.subCode,
         sessions: subject.sessions,
-        sclassNameId: subject.sclassNameId,
+        sclassId: subject.sclassId,
         schoolId: req.body.adminID,
       }));
       const existingSubjectBySubCode = await prisma.subject.findFirst({
@@ -34,21 +34,46 @@ const subjectCtrl = {
     }
   },
 
+  // allSubjects: async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const subjects = await prisma.subject.findMany({
+  //       where: { schoolId: parseInt(id) },
+  //       include: { sclassName: true },
+  //     });
+
+  //     if (subjects.length > 0) {
+  //       res.send(subjects);
+  //     } else {
+  //       res.send({ message: "No subjects found" });
+  //     }
+  //   } catch (err) {
+  //     res.status(500).json(err);
+  //   }
+  // },
+
   allSubjects: async (req, res) => {
     try {
       const { id } = req.params;
+
+      const schoolId = parseInt(id);
+      if (isNaN(schoolId)) {
+        return res.status(400).json({ error: "Invalid school ID" });
+      }
+
       const subjects = await prisma.subject.findMany({
-        where: { schoolId: parseInt(id) },
-        include: { sclassName: true },
+        where: { schoolId },
+        include: { sclass: true },
       });
 
-      if (subjects.length > 0) {
-        res.send(subjects);
-      } else {
-        res.send({ message: "No subjects found" });
-      }
+      if (subjects.length > 0) res.json(subjects);
+      else res.send({ message: "No subjects found" });
     } catch (err) {
-      res.status(500).json(err);
+      console.error("Error fetching subjects:", err);
+      res.status(500).json({
+        error: "An error occurred while fetching subjects",
+        details: err.message,
+      });
     }
   },
 
@@ -92,7 +117,7 @@ const subjectCtrl = {
       const { id } = req.params;
       const subject = await prisma.subject.findUnique({
         where: { id: parseInt(id) },
-        include: { sclassName: true, teacher: true },
+        include: { sclass: true, teacher: true },
       });
 
       if (subject) {

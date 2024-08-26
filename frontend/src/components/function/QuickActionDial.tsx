@@ -15,11 +15,11 @@ const QuickActionDial: React.FC<Props> = ({ actions }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="absolute pt-2">
       <button
         className="flex items-center justify-center w-12 h-12 bg-green-900 rounded-full text-white focus:outline-none"
         onClick={() => setOpen(!open)}
-        aria-label="SpeedDial toggle"
+        aria-label="Toggle"
       >
         {open ? <X className="w-6 h-6" /> : <Settings className="w-6 h-6" />}
       </button>

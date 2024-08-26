@@ -21,6 +21,7 @@ export const Login = () => {
     e.preventDefault();
 
     toast.loading("Trying to login...");
+    toast.dismiss();
 
     try {
       await login(fields, role);

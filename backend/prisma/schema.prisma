@@ -26,6 +26,7 @@ model Admin {
   parents    Parent[]
   subjects   Subject[]
   sclasses   Sclass[]
+  complains  Complain[] 
 }
 
 model Teacher {
@@ -104,6 +105,7 @@ model Student {
   parentId    Int?
   fees        Fee[]
   disabled    Boolean      @default(false)
+  complains   Complain[]
 }
 
 model ExamResult {
@@ -137,4 +139,16 @@ model Fee {
   paymentDate DateTime?
   parent      Parent?  @relation(fields: [parentId], references: [id])
   parentId    Int?
+}
+
+model Complain {
+  id        Int      @id @default(autoincrement())
+  user      Student  @relation(fields: [userId], references: [id])
+  userId    Int
+  date      DateTime
+  complaint String
+  school    Admin    @relation(fields: [schoolId], references: [id])
+  schoolId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -9,9 +9,13 @@ const {
 const studentCtrl = {
   studentRegister: async (req, res) => {
     try {
-      const { password, rollNum, adminID, sclassId } = req.body;
+      const { name, password, rollNum, adminID, sclassId } = req.body;
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
+
+      if (!sclassId) {
+        throw new Error("sclassId must be defined");
+      }
 
       const existingStudent = await prisma.student.findFirst({
         where: {
@@ -24,14 +28,16 @@ const studentCtrl = {
       else {
         const student = await prisma.student.create({
           data: {
-            ...req.body,
-            schoolId: adminID,
+            name,
+            rollNum,
             password: hashedPassword,
+            sclassId,
+            schoolId: adminID,
           },
         });
 
         const { password, ...studentData } = student;
-        res.send(studentData);
+        res.status(201).json(studentData);
       }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -48,6 +54,56 @@ const studentCtrl = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  //   try {
+  //     const { name, password, rollNum, adminID, sclassId } = req.body;
+
+  //     if (!sclassId) {
+  //       throw new Error("sclassId must be defined");
+  //     }
+
+  //     const salt = await bcrypt.genSalt(10);
+  //     const hashedPassword = await bcrypt.hash(password, salt);
+
+  //     const existingStudent = await prisma.student.findFirst({
+  //       where: {
+  //         rollNum: rollNum,
+  //         schoolId: adminID,
+  //         sclassId: sclassId,
+  //       },
+  //     });
+
+  //     if (existingStudent) {
+  //       return res.status(400).json({ message: "Roll Number already exists" });
+  //     }
+
+  //     const student = await prisma.student.create({
+  //       data: {
+  //         name,
+  //         rollNum,
+  //         password: hashedPassword,
+  //         sclassId,
+  //         schoolId: adminID,
+  //         // attendance: attendance || [], // Ensure attendance is an array
+  //       },
+  //     });
+
+  //     const { password: _, ...studentData } = student;
+  //     res.status(201).json(studentData);
+  //   } catch (error) {
+  //     if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  //       switch (error.code) {
+  //         case "P2002":
+  //           return res
+  //             .status(400)
+  //             .json({ message: "Unique constraint failed" });
+  //         default:
+  //           return res.status(500).json({ error: "Database error" });
+  //       }
+  //     }
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
 
   studentLogin: async (req, res) => {
     try {
@@ -153,16 +209,28 @@ const studentCtrl = {
         include: {
           school: { select: { schoolName: true } },
           sclass: { select: { sclassName: true } },
-          examResult: { include: { subName: { select: { subName: true } } } },
+          examResults: { include: { subName: { select: { subName: true } } } },
           attendance: { include: { subName: { select: { subName: true } } } },
+          parent: true,
           fees: true,
         },
       });
 
-      if (student) {
-        const { password, ...studentData } = student;
-        res.send(studentData);
-      } else return res.status(404).json({ message: "No student found" });
+      // if (student) {
+      //   const { password, ...studentData } = student;
+      //   res.send(studentData);
+      // } else return res.status(404).json({ message: "No student found" });
+
+      // if (student.disabled) {
+      //   return res
+      //     .status(403)
+      //     .json({ message: "Account is disabled due to unpaid fees" });
+      // }
+
+      // res.json(student);
+      if (!student) {
+        return res.status(404).json({ message: "No student found" });
+      }
 
       if (student.disabled) {
         return res
@@ -170,7 +238,8 @@ const studentCtrl = {
           .json({ message: "Account is disabled due to unpaid fees" });
       }
 
-      res.json(student);
+      const { password, ...studentData } = student;
+      return res.json(studentData);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -237,7 +306,7 @@ const studentCtrl = {
       const { password, ...studentWithoutPassword } = result;
       res.send(studentWithoutPassword);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 

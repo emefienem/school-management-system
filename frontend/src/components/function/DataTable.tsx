@@ -59,7 +59,7 @@ const TableTemplate: React.FC<TableTemplateProps> = ({
                 {column.label}
               </th>
             ))}
-            <th className="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
+            <th className="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider flex justify-center">
               Actions
             </th>
           </tr>

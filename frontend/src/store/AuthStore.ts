@@ -4,7 +4,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_BASE_URL;
 interface AuthState {
   status: string;
-  userDetails: any[];
+  userDetails: { [key: string]: any };
   tempDetails: any[];
   loading: boolean;
   currentUser: any | null;
@@ -15,7 +15,12 @@ interface AuthState {
   accessToken: string;
   refreshToken: string;
   subjectDetails: any;
+  sclassDetails: any;
   sclassStudents: any[];
+  subjectList: any[];
+  sclasses: any[];
+  studentsList: any[];
+  complainList: any[];
   authRequest: () => void;
   authSuccess: (user: any) => void;
   authFailed: (error: string) => void;
@@ -32,6 +37,7 @@ interface AuthState {
   logout: () => void;
   getUserDetails: (id: string, address: string) => Promise<void>;
   updateUser: (fields: any, id: string, address: string) => Promise<void>;
+  deleteUser: (id: string, address: string) => Promise<void>;
   addStuff: (fields: any, address: string) => Promise<void>;
   getAllTeachers: (id: string) => Promise<void>;
   getTeacherDetails: (id: string) => Promise<void>;
@@ -45,21 +51,22 @@ interface AuthState {
     fields: any,
     address: string
   ) => Promise<void>;
-  removeStuff: (id: string, address: string) => Promise<void>;
+  // removeStuff: (id: string, address: string) => Promise<void>;
   getAllSclasses: (id: string, address: string) => Promise<void>;
-  getClassStudents: (id: string) => Promise<void>;
+  getClassStudents: (id: string, address: string) => Promise<void>;
   getClassDetails: (id: string, address: string) => Promise<void>;
   getSubjectList: (id: string, address: string) => Promise<void>;
   getTeacherFreeClassSubjects: (id: string) => Promise<void>;
-  getSubjectDetails: (id: string) => Promise<void>;
+  getSubjectDetails: (id: string, address: string) => Promise<void>;
   resetAuthStatus: () => void;
+  getAllComplains: (id: string, address: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       status: "idle",
-      userDetails: [],
+      userDetails: {},
       tempDetails: [],
       loading: false,
       currentUser: JSON.parse(localStorage.getItem("user") || "null"),
@@ -71,10 +78,14 @@ export const useAuthStore = create<AuthState>()(
       accessToken: "",
       refreshToken: "",
       subjectDetails: null,
+      sclassDetails: null,
       sclassStudents: [],
+      subjectList: [],
+      sclasses: [],
+      studentsList: [],
+      complainList: [],
       authRequest: () => set({ status: "loading" }),
       authSuccess: (user) => {
-        // const { accessToken, refreshToken, role } = admin;
         set({
           status: "success",
           currentUser: user,
@@ -107,6 +118,7 @@ export const useAuthStore = create<AuthState>()(
       getFailed: (error) => set({ response: error, loading: false }),
       getError: (error) => set({ error, loading: false }),
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+
       login: async (fields, role) => {
         set({ status: "loading" });
         try {
@@ -117,15 +129,6 @@ export const useAuthStore = create<AuthState>()(
           {
             console.log(result);
           }
-          // if (result.data.role && result.data.role.length > 0) {
-          //   set({
-          //     accessToken: result.data.accessToken,
-          //     refreshToken: result.data.refreshToken,
-          //   });
-          //   useAuthStore.getState().authSuccess(result.data);
-          // } else {
-          //   set({ status: "failed", response: result.data.message });
-          // }
           if (result.data.accessToken && result.data.refreshToken) {
             useAuthStore.getState().authSuccess(result.data);
           } else {
@@ -145,18 +148,34 @@ export const useAuthStore = create<AuthState>()(
               headers: { "Content-Type": "application/json" },
             }
           );
-          if (result.data.schoolName) {
+
+          if (role === "admin" && result.data.schoolName) {
+            // Admin registration
             set({
               accessToken: result.data.accessToken,
               refreshToken: result.data.refreshToken,
+              // status: "added",
+              // response: result.data.message,
             });
             useAuthStore.getState().authSuccess(result.data);
+          } else if (role === "student" && result.data.id) {
+            // Student registration
+            set({
+              status: "added",
+              response:
+                result.data.message || "Student registered successfully",
+            });
           } else if (result.data.school) {
+            // Temporary details handling (if needed)
             set({ tempDetails: result.data });
           } else {
-            set({ status: "failed", response: result.data.message });
+            set({
+              status: "failed",
+              response: result.data.message || "An error occurred",
+            });
           }
         } catch (error: any) {
+          console.error("Register error:", error);
           set({ status: "error", error: error.message || "Unknown error" });
         }
       },
@@ -171,14 +190,22 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem("user");
       },
       getUserDetails: async (id, address) => {
-        set({ loading: true });
+        set({ loading: true, status: "loading" });
         try {
-          const result = await axios.get(`${apiUrl}/${address}/${id}`);
+          const result = await axios.get(`${apiUrl}/${address}/infor/${id}`);
           if (result.data) {
-            set({ userDetails: result.data, loading: false });
+            set({
+              userDetails: result.data,
+              loading: false,
+              status: "success",
+            });
           }
         } catch (error: any) {
-          set({ error: error.message || "Unknown error", loading: false });
+          set({
+            error: error.message || "Unknown error",
+            loading: false,
+            status: "failed",
+          });
         }
       },
       updateUser: async (fields, id, address) => {
@@ -200,11 +227,30 @@ export const useAuthStore = create<AuthState>()(
           set({ error: error.message || "Unknown error", loading: false });
         }
       },
+      deleteUser: async (id, address) => {
+        set({ loading: true });
+        try {
+          const result = await axios.delete(
+            `${apiUrl}/${address}/delete/${id}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          set({ loading: false });
+
+          return result.data;
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
       addStuff: async (fields, address) => {
         set({ status: "loading" });
         try {
           const result = await axios.post(
-            `${apiUrl}/${address}Create`,
+            `${apiUrl}/${address}/create`,
             fields,
             {
               headers: { "Content-Type": "application/json" },
@@ -213,7 +259,7 @@ export const useAuthStore = create<AuthState>()(
           if (result.data.message) {
             set({ status: "failed", response: result.data.message });
           } else {
-            set({ tempDetails: result.data });
+            set({ status: "added", tempDetails: result.data });
           }
         } catch (error: any) {
           set({ status: "error", error: error.message || "Unknown error" });
@@ -271,7 +317,7 @@ export const useAuthStore = create<AuthState>()(
           if (result.data.message) {
             set({ response: result.data.message, loading: false });
           } else {
-            set({ userDetails: result.data, loading: false });
+            set({ studentsList: result.data, loading: false });
           }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
@@ -294,19 +340,19 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      removeStuff: async (id, address) => {
-        set({ loading: true });
-        try {
-          const result = await axios.put(`${apiUrl}/${address}/${id}`);
-          if (result.data.message) {
-            set({ response: result.data.message, loading: false });
-          } else {
-            set({ response: "Remove successful", loading: false });
-          }
-        } catch (error: any) {
-          set({ error: error.message || "Unknown error", loading: false });
-        }
-      },
+      // removeStuff: async (id, address) => {
+      //   set({ loading: true });
+      //   try {
+      //     const result = await axios.put(`${apiUrl}/${address}/${id}`);
+      //     if (result.data.message) {
+      //       set({ response: result.data.message, loading: false });
+      //     } else {
+      //       set({ response: "Remove successful", loading: false });
+      //     }
+      //   } catch (error: any) {
+      //     set({ error: error.message || "Unknown error", loading: false });
+      //   }
+      // },
 
       getAllSclasses: async (id, address) => {
         set({ loading: true });
@@ -314,20 +360,44 @@ export const useAuthStore = create<AuthState>()(
           const result = await axios.get(
             `${apiUrl}/${address}/class-list/${id}`
           );
-          if (result.data.message) {
-            set({ response: result.data.message, loading: false });
+
+          console.log("API Result:", result.data);
+
+          if (
+            result.data &&
+            Array.isArray(result.data) &&
+            result.data.length > 0
+          ) {
+            set({ sclasses: result.data, response: null, loading: false });
+          } else if (result.data && result.data.message) {
+            set({
+              response: result.data.message,
+              sclasses: [],
+              loading: false,
+            });
           } else {
-            set({ tempDetails: result.data, loading: false });
+            set({
+              response: "Unexpected response format",
+              sclasses: [],
+              loading: false,
+            });
           }
         } catch (error: any) {
-          set({ error: error.message || "Unknown error", loading: false });
+          console.error("API Error:", error);
+          set({
+            error: error.message || "Unknown error",
+            sclasses: [],
+            loading: false,
+          });
         }
       },
 
-      getClassStudents: async (id) => {
+      getClassStudents: async (id, address) => {
         set({ loading: true });
         try {
-          const result = await axios.get(`${apiUrl}/class/students/${id}`);
+          const result = await axios.get(
+            `${apiUrl}/${address}/class/students/${id}`
+          );
           if (result.data.message) {
             set({ response: result.data.message, loading: false });
           } else {
@@ -341,9 +411,9 @@ export const useAuthStore = create<AuthState>()(
       getClassDetails: async (id, address) => {
         set({ loading: true });
         try {
-          const result = await axios.get(`${apiUrl}/class/${id}`);
+          const result = await axios.get(`${apiUrl}/${address}/class/${id}`);
           if (result.data) {
-            set({ tempDetails: result.data, loading: false });
+            set({ sclassDetails: result.data, loading: false });
           }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
@@ -354,10 +424,20 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true });
         try {
           const result = await axios.get(
-            `${apiUrl}/${address}/free-subject-list/${id}`
+            `${apiUrl}/${address}/all-subjects/${id}`
           );
-          if (result.data.message) {
-            set({ response: result.data.message, loading: false });
+          console.log(result.data);
+
+          if (result.data && Array.isArray(result.data)) {
+            set({
+              subjectList: result.data,
+              loading: false,
+            });
+          } else if (result.data && result.data.message) {
+            set({
+              subjectList: [],
+              loading: false,
+            });
           } else {
             set({ tempDetails: result.data, loading: false });
           }
@@ -382,15 +462,39 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      getSubjectDetails: async (id) => {
+      getSubjectDetails: async (id, address) => {
         set({ loading: true });
         try {
-          const result = await axios.get(`${apiUrl}/subject/${id}`);
+          const result = await axios.get(`${apiUrl}/${address}/subject/${id}`);
           if (result.data) {
             set({ subjectDetails: result.data, loading: false });
           }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getAllComplains: async (id, address) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(`${apiUrl}/${address}/list/${id}`);
+          if (result.data.message) {
+            set({
+              error: result.data.message,
+              loading: false,
+            });
+          } else {
+            set({
+              complainList: result.data,
+              loading: false,
+              error: null,
+            });
+          }
+        } catch (error: any) {
+          set({
+            error: error.message || "Unknown error",
+            loading: false,
+          });
         }
       },
 

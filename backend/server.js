@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { Client } = require("pg");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 const app = express();
 
 app.use(express.json());
@@ -22,8 +25,22 @@ app.use("/teacher", require("./routers/teacherRoute"));
 app.use("/student", require("./routers/studentRoute"));
 app.use("/subject", require("./routers/subjectRoute"));
 app.use("/class", require("./routers/classRoute"));
+app.use("/complain", require("./routers/complainRoute"));
 
 app.use("/auth", require("./routers/refreshRoute"));
+
+async function main() {
+  try {
+    await prisma.$connect();
+    console.log("Connected to the database successfully.");
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+main();
 
 const connectionString =
   "postgresql://postgres:emefienem@localhost:5432/mydb?schema=public";

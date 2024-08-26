@@ -6,16 +6,16 @@ router.post("/register", studentCtrl.studentRegister);
 router.post("/login", studentCtrl.studentLogin);
 
 router.get("/get-all-students/:id", studentCtrl.getStudents);
-router.get("/get-details/:id", studentCtrl.getStudentDetails);
+router.get("/infor/:id", studentCtrl.getStudentDetails);
 
 router.delete("/delete-many-student/:id", studentCtrl.deleteManyStudents);
 router.delete(
   "/delete-students-by-class/:id",
   studentCtrl.deleteStudentsByClass
 );
-router.delete("/delete-student/:id", studentCtrl.deleteStudent);
+router.delete("/delete/:id", studentCtrl.deleteStudent);
 
-router.put("/update-student/:id", studentCtrl.updateStudent);
+router.put("/:id", studentCtrl.updateStudent);
 
 router.put("/update-exam-result/:id", studentCtrl.updateExamResult);
 

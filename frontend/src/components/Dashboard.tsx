@@ -25,28 +25,28 @@ const Dashboard = () => {
     getAllSclasses,
     getAllTeachers,
     studentsList,
-    sclassesList,
+    sclasses,
   } = useAuth();
 
-  const adminID = currentUser.user.id;
+  const ID = currentUser.user.id;
   const classID = currentUser?.teachSclass?.id;
   const subjectID = currentUser?.teachSubject?.id;
 
   useEffect(() => {
-    if (subjectID) getSubjectDetails(subjectID);
-    if (classID) getClassStudents(classID);
+    if (subjectID) getSubjectDetails(subjectID, "subject");
+    if (classID) getClassStudents(classID, "class");
   }, [subjectID, classID]);
 
   useEffect(() => {
-    if (adminID) {
-      getAllStudents(adminID);
-      getAllSclasses(adminID, "class");
-      getAllTeachers(adminID);
+    if (ID) {
+      getAllStudents(ID);
+      getAllSclasses(ID, "class");
+      getAllTeachers(ID);
     }
-  }, [adminID, getAllStudents, getAllSclasses, getAllTeachers]);
+  }, [ID, getAllStudents, getAllSclasses, getAllTeachers]);
 
   const numberOfStudent = studentsList && studentsList.length;
-  const numberOfClasses = sclassesList && sclassesList.length;
+  const numberOfClasses = sclasses && sclasses.length;
   const numberOfTeachers = 3;
 
   const numberOfStudents = sclassStudents?.length || 0;
@@ -54,6 +54,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto mt-4 mb-4">
+      <p> Dashboard</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <AuthorizedComponent roles={["Admin"]}>
           <div className="bg-white shadow-md rounded-lg p-6 text-center">

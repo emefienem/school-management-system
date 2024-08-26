@@ -1,23 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../api/useAuth";
-import { PlusIcon, Trash2Icon, EyeIcon, MenuIcon } from "lucide-react";
-import QuickActionDial from "../QuickActionDial";
-import TableTemplate from "../DataTable";
-import Popup from "../Popup";
+import {
+  PlusIcon,
+  Trash2Icon,
+  EyeIcon,
+  MenuIcon,
+  ArrowLeft,
+  XCircle,
+  PlusCircle,
+} from "lucide-react";
+import QuickActionDial from "../function/QuickActionDial";
+import TableTemplate from "../function/DataTable";
+import Popup from "../function/Popup";
+import SLG from "../../assets/slg.png";
 
 const ShowClasses = () => {
   const navigate = useNavigate();
-  const { sclassesList, currentUser, getAllSclasses, loading, getresponse } =
-    useAuth();
+  const {
+    sclasses,
+    currentUser,
+    getAllSclasses,
+    loading,
+    getresponse,
+    deleteUser,
+  } = useAuth();
 
-  const adminID = currentUser.user.id;
+  const ID = currentUser.user.id;
 
   useEffect(() => {
-    if (adminID) {
-      getAllSclasses(adminID, "class");
+    console.log("adminID:", ID);
+    if (ID) {
+      getAllSclasses(ID, "class");
+      console.log("Fetched Classes:", sclasses);
+      console.log("Generated Rows:", sclassRows);
+      console.log("Response Check:", getresponse);
+      console.log(sclasses);
     } else console.log("Admin ID is undefined");
-  }, [adminID]);
+  }, [ID, getAllSclasses]);
 
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState("");
@@ -28,14 +48,14 @@ const ShowClasses = () => {
     setMessage("Sorry the delete function has been disabled for now.");
     setShowPopup(true);
     // await deleteUser(deleteID, address).then(() => {
-    //   getAllSclasses(adminID, "class");
+    //   getAllSclasses(ID, "class");
     // });
   };
 
   const sclassColumns = [{ id: "name", label: "Class Name", minWidth: 170 }];
 
-  const sclassRows = sclassesList?.length
-    ? sclassesList.map((sclass) => ({
+  const sclassRows = sclasses?.length
+    ? sclasses.map((sclass) => ({
         name: sclass.sclassName,
         id: sclass.id,
       }))
@@ -59,9 +79,9 @@ const ShowClasses = () => {
     ];
 
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex gap-2 items-center justify-center">
         <button
-          onClick={() => deleteHandler(row.id, "Sclass")}
+          onClick={() => deleteHandler(row.id, "class")}
           className="p-2 text-red-500 hover:text-red-700"
         >
           <Trash2Icon />
@@ -71,7 +91,6 @@ const ShowClasses = () => {
           onClick={() => navigate("/admin/classes/class/" + row.id)}
         >
           <EyeIcon />
-          View
         </button>
         <ActionMenu actions={actions} />
       </div>
@@ -102,7 +121,7 @@ const ShowClasses = () => {
           className="p-2 text-blue-500 hover:text-blue-700"
         >
           <MenuIcon />
-          Add
+          {/* Add */}
         </button>
         {isOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-50">
@@ -124,22 +143,34 @@ const ShowClasses = () => {
 
   const actions = [
     {
-      icon: <PlusIcon />,
+      icon: <PlusCircle className="text-blue-600" />,
       name: "Add New Class",
       action: () => navigate("/admin/add-class"),
     },
     {
-      icon: <Trash2Icon />,
+      icon: <XCircle className="text-red-600" />,
       name: "Delete All Classes",
-      action: () => deleteHandler(adminID, "Sclasses"),
+      action: () => deleteHandler(ID, "classes"),
     },
   ];
   return (
-    <>
+    <div className="relative">
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-center flex justify-center items-center py-4">
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+
+          <img src={SLG} alt="Loading" className="animate-spin h-16 w-16" />
+        </div>
       ) : (
         <>
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+
           {getresponse ? (
             <div className="flex justify-end mt-4">
               <button
@@ -150,8 +181,8 @@ const ShowClasses = () => {
               </button>
             </div>
           ) : (
-            <>
-              {Array.isArray(sclassesList) && sclassesList.length > 0 && (
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              {Array.isArray(sclasses) && sclasses.length > 0 && (
                 <TableTemplate
                   buttonHaver={SclassButtonHaver}
                   columns={sclassColumns}
@@ -159,7 +190,7 @@ const ShowClasses = () => {
                 />
               )}
               <QuickActionDial actions={actions} />
-            </>
+            </div>
           )}
         </>
       )}
@@ -168,7 +199,7 @@ const ShowClasses = () => {
         setShowPopup={setShowPopup}
         showPopup={showPopup}
       />
-    </>
+    </div>
   );
 };
 

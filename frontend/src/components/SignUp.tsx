@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
+// import { Navigate } from "react-router-dom";
 import { useAuth } from "@/api/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 export const Signup = () => {
   const [fields, setFields] = useState({
@@ -12,7 +12,7 @@ export const Signup = () => {
   });
 
   const { register } = useAuth();
-
+  const nav = useNavigate();
   const handleChange = (e: any) => {
     setFields({
       ...fields,
@@ -27,8 +27,8 @@ export const Signup = () => {
 
     try {
       await register(fields, "admin");
-      <Navigate to={"/login"} />;
       toast.success("Create account successfully!");
+      nav("/login");
     } catch (error: any) {
       toast.error(error || "An error occurred");
     }
