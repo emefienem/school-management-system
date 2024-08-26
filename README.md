@@ -11,7 +11,7 @@ This School Management System enhances communication and interaction between par
   - Receive complaints from students
   - Generate various reports
 
-  - **Teacher Features:**
+- **Teacher Features:**
   - Manage student information
   - Track attendance
   - Handle test and assignments
