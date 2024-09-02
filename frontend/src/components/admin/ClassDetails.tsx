@@ -85,7 +85,7 @@ const ClassDetails = () => {
     return (
       <div className="flex space-x-2">
         <button
-          onClick={() => deleteHandler(row.id, "Subject")}
+          onClick={() => deleteHandler(row.id, "subject")}
           className="text-red-500"
         >
           <Trash2 />
@@ -111,7 +111,7 @@ const ClassDetails = () => {
     {
       icon: <Trash2 className="text-red-500" />,
       name: "Delete All Subjects",
-      action: () => deleteHandler(classID!, "SubjectsClass"),
+      action: () => deleteHandler(classID!, "subject"),
     },
   ];
 
@@ -191,7 +191,7 @@ const ClassDetails = () => {
     {
       icon: <UserX className="text-red-500" />,
       name: "Delete All Students",
-      action: () => deleteHandler(classID!, "StudentsClass"),
+      action: () => deleteHandler(classID!, "student"),
     },
   ];
 
@@ -226,7 +226,7 @@ const ClassDetails = () => {
     return (
       <>
         <h2 className="text-xl font-semibold mb-4">Teachers</h2>
-        {/* Add Teachers section here */}
+        {/* I would add teachers section here */}
       </>
     );
   };

@@ -41,6 +41,7 @@ export const useAuth = () => {
     teacherDetails,
     getTeacherFreeClassSubjects,
     updateTeachSubject,
+    updateStudentFields,
   } = useAuthStore((state) => ({
     register: state.register,
     login: state.login,
@@ -82,6 +83,7 @@ export const useAuth = () => {
     getTeacherDetails: state.getTeacherDetails,
     getTeacherFreeClassSubjects: state.getTeacherFreeClassSubjects,
     updateTeachSubject: state.updateTeachSubject,
+    updateStudentFields: state.updateStudentFields,
   }));
 
   return {
@@ -124,5 +126,6 @@ export const useAuth = () => {
     getTeacherDetails,
     getTeacherFreeClassSubjects,
     updateTeachSubject,
+    updateStudentFields,
   };
 };

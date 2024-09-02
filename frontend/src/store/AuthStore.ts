@@ -341,7 +341,7 @@ export const useAuthStore = create<AuthState>()(
       updateStudentFields: async (id, fields, address) => {
         set({ loading: true });
         try {
-          const result = await axios.put(`${apiUrl}/${address}/${id}`, fields, {
+          const result = await axios.put(`${apiUrl}/${address}/student-attendance/${id}`, fields, {
             headers: { "Content-Type": "application/json" },
           });
           if (result.data.message) {

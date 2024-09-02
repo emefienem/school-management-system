@@ -175,8 +175,11 @@ const ViewSubject: React.FC = () => {
           </span>
         </p>
         {subjectDetails?.teacher ? (
-          <p className="text-lg mb-2">
-            Teacher Name: {subjectDetails.teacher.name}
+          <p className="text-lg mb-2 uppercase font-bold">
+            Teacher Name:{" "}
+            <span className="text-orange-500">
+              {subjectDetails.teacher.name}
+            </span>
           </p>
         ) : (
           <button

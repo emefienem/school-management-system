@@ -175,7 +175,7 @@ const ShowStudents: React.FC = () => {
     {
       icon: <XCircle className="text-red-600" />,
       name: "Delete All Students",
-      action: () => deleteHandler(ID, "Students"),
+      action: () => deleteHandler(ID, "student"),
     },
   ];
 

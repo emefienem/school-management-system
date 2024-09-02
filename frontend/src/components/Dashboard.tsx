@@ -19,13 +19,6 @@ import { calculateOverallAttendancePercentage } from "./function/AttendanceFunct
 import { useNavigate } from "react-router";
 import PieCharts from "./function/PieChart";
 
-interface Teacher {
-  id: string;
-  name: string;
-  teachSubject?: { subName: string };
-  teachSclass: { sclassName: string; id: string };
-}
-
 const Dashboard = () => {
   const {
     currentUser,
@@ -50,7 +43,7 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
   const ID =
-    currentRole === "Admin" || currentRole === "Student"
+    currentRole === "Admin"
       ? currentUser?.user?.id
       : currentUser?.user?.schoolId;
   const teachSclassID = currentUser?.user?.teachSclassId;
@@ -195,7 +188,7 @@ const Dashboard = () => {
           <Card
             icon={<Book size={32} />}
             title="Total Assignment"
-            count={15}
+            count={0}
             duration={4}
           />
         </AuthorizedComponent>
