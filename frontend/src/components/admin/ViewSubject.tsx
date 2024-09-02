@@ -1,38 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TableTemplate from "../function/DataTable";
-import { Car, BarChart } from "lucide-react";
+import { Car, BarChart, Loader, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
-
-interface Student {
-  id: string;
-  rollNum: string;
-  name: string;
-}
-
-interface SubjectDetails {
-  subName: string;
-  subCode: string;
-  sessions: number;
-  sclass?: {
-    sclassName: string;
-  };
-  teacher?: {
-    name: string;
-  };
-}
-
-interface SClassState {
-  loading: boolean;
-  subjectDetails: SubjectDetails | null;
-  sclassStudents: Student[];
-  getresponse: boolean;
-  error: string | null;
-}
-
-interface RootState {
-  sclass: SClassState;
-}
 
 const ViewSubject: React.FC = () => {
   const navigate = useNavigate();
@@ -225,7 +195,16 @@ const ViewSubject: React.FC = () => {
   return (
     <div>
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-center flex justify-center items-center py-4">
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+
+          <div className="flex justify-center items-center h-screen">
+            <Loader className="animate-spin w-12 h-12 text-purple-600" />
+          </div>
+        </div>
       ) : (
         <div className="w-full">
           <div className="border-b border-gray-300">

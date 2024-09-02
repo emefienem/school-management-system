@@ -55,65 +55,18 @@ const studentCtrl = {
     }
   },
 
-  //   try {
-  //     const { name, password, rollNum, adminID, sclassId } = req.body;
-
-  //     if (!sclassId) {
-  //       throw new Error("sclassId must be defined");
-  //     }
-
-  //     const salt = await bcrypt.genSalt(10);
-  //     const hashedPassword = await bcrypt.hash(password, salt);
-
-  //     const existingStudent = await prisma.student.findFirst({
-  //       where: {
-  //         rollNum: rollNum,
-  //         schoolId: adminID,
-  //         sclassId: sclassId,
-  //       },
-  //     });
-
-  //     if (existingStudent) {
-  //       return res.status(400).json({ message: "Roll Number already exists" });
-  //     }
-
-  //     const student = await prisma.student.create({
-  //       data: {
-  //         name,
-  //         rollNum,
-  //         password: hashedPassword,
-  //         sclassId,
-  //         schoolId: adminID,
-  //         // attendance: attendance || [], // Ensure attendance is an array
-  //       },
-  //     });
-
-  //     const { password: _, ...studentData } = student;
-  //     res.status(201).json(studentData);
-  //   } catch (error) {
-  //     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-  //       switch (error.code) {
-  //         case "P2002":
-  //           return res
-  //             .status(400)
-  //             .json({ message: "Unique constraint failed" });
-  //         default:
-  //           return res.status(500).json({ error: "Database error" });
-  //       }
-  //     }
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // },
-
   studentLogin: async (req, res) => {
     try {
       const { rollNum, studentName, password } = req.body;
-      let user = await prisma.student.findUnique({
+      const rollNumber = parseInt(rollNum, 10);
+      let user = await prisma.student.findFirst({
         where: {
-          rollNum_name: {
-            rollNum: rollNum,
-            name: studentName,
-          },
+          // rollNum_name: {
+          //   rollNum: rollNum,
+          //   name: studentName,
+          // },
+          rollNum: rollNumber,
+          name: studentName,
         },
       });
 
@@ -125,7 +78,7 @@ const studentCtrl = {
             include: {
               school: { select: { schoolName: true } },
               sclass: { select: { sclassName: true } },
-              examResult: {
+              examResults: {
                 include: { subName: { select: { subName: true } } },
               },
               attendance: {
@@ -136,11 +89,9 @@ const studentCtrl = {
 
           const { password, ...studentData } = user;
 
-          // Generate tokens
           const accessToken = generateAccessToken(studentData);
           const refreshToken = generateRefreshToken(studentData);
 
-          // Set cookies
           res.cookie("accessToken", accessToken, {
             httpOnly: true,
             path: "/auth/access-token",
@@ -171,7 +122,6 @@ const studentCtrl = {
       }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        // Handle known Prisma errors
         switch (error.code) {
           case "P2002":
             return res

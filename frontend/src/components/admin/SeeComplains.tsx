@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import TableTemplate from "../function/DataTable";
-import { ArrowLeft, CheckSquare, Square } from "lucide-react";
+import { ArrowLeft, CheckSquare, Loader, Square } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
 import SLG from "../../assets/slg.png";
 import { useNavigate } from "react-router";
@@ -31,13 +31,10 @@ const SeeComplains: React.FC = () => {
   const ID = currentUser.user.id;
   useEffect(() => {
     if (currentUser.user.id) {
-      getAllComplains(currentUser.user.id, "complain");
+      getAllComplains(ID, "complain");
+      console.log(getresponse);
     }
-  }, [currentUser.user.id]);
-
-  if (error) {
-    console.log(error);
-  }
+  }, [ID]);
 
   const complainColumns = [
     { id: "user", label: "User", minWidth: 170 },
@@ -66,7 +63,7 @@ const SeeComplains: React.FC = () => {
       <Checkbox
         checked={checkedItems[row.id] || false}
         onChange={() => toggleCheckbox(row.id)}
-        aria-label="Checkbox demo"
+        aria-label="Checkbox"
       />
     </div>
   );
@@ -74,14 +71,17 @@ const SeeComplains: React.FC = () => {
   return (
     <div className="">
       {loading ? (
-        <div className="text-center flex justify-center items-center py-4">
+        <>
           <ArrowLeft
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white mb-8"
           />
-
-          <img src={SLG} alt="Loading" className="animate-spin h-16 w-16" />
-        </div>
+          <div className="text-center flex justify-center items-center py-4">
+            <div className="flex justify-center items-center h-screen">
+              <Loader className="animate-spin w-12 h-12 text-purple-600" />
+            </div>
+          </div>
+        </>
       ) : (
         <>
           <ArrowLeft

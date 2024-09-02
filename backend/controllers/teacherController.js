@@ -50,10 +50,8 @@ const teacherCtrl = {
         res.send({ ...teacher, password: undefined });
       }
     } catch (error) {
-      // res.status(500).json({ message: error.message });
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        // Handle known Prisma errors
-        switch (err.code) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
           case "P2002":
             return res
               .status(400)
@@ -62,17 +60,16 @@ const teacherCtrl = {
             return res.status(500).json({ error: "Database error" });
         }
       }
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: error.message });
     }
   },
 
   teacherLogin: async (req, res) => {
     try {
-      // const {email, password} = req.body
       let user = await prisma.teacher.findFirst({
         where: { email: req.body.email },
         include: {
-          teacherSubject: true,
+          teachSubject: true,
           school: true,
           teachSclass: true,
         },
@@ -114,10 +111,8 @@ const teacherCtrl = {
         refreshToken,
       });
     } catch (error) {
-      // res.status(500).json({ message: error.message });
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        // Handle known Prisma errors
-        switch (err.code) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
           case "P2002":
             return res
               .status(400)
@@ -126,7 +121,7 @@ const teacherCtrl = {
             return res.status(500).json({ error: "Database error" });
         }
       }
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: error.message });
     }
   },
 

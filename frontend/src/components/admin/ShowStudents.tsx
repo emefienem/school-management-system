@@ -8,6 +8,7 @@ import {
   ChevronDown,
   EyeIcon,
   ArrowLeft,
+  Loader,
 } from "lucide-react";
 import Popup from "../function/Popup";
 import TableTemplate from "../function/DataTable";
@@ -181,14 +182,17 @@ const ShowStudents: React.FC = () => {
   return (
     <>
       {loading ? (
-        <div className="text-center flex justify-center items-center py-4">
+        <>
           <ArrowLeft
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white mb-8"
           />
-
-          <img src={SLG} alt="Loading" className="animate-spin h-16 w-16" />
-        </div>
+          <div className="text-center flex justify-center items-center py-4">
+            <div className="flex justify-center items-center h-screen">
+              <Loader className="animate-spin w-12 h-12 text-purple-600" />
+            </div>
+          </div>
+        </>
       ) : (
         <>
           <ArrowLeft

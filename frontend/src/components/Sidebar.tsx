@@ -8,12 +8,12 @@ import {
   Ticket,
   ClipboardIcon,
   CopyX,
+  LogOutIcon,
 } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
 import { cn } from "@/components/lib/utils";
 import { BsThreeDots } from "react-icons/bs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import Logout from "./Logout";
 
 type SidebarProps = {
   Icon: LucideIcon;
@@ -46,8 +46,9 @@ const SidebarItem = ({
       role="button"
       onClick={() => navigate(to)}
       className={cn(
-        "w-full px-2 text-neutral-500 flex items-center h-10 my-2 hover:text-white transition-all",
-        isActive && "bg-slate-700/40 rounded-lg text-white"
+        "w-full px-2 text-black flex items-center h-10 my-2 transition-all duration-75 ease-in-out",
+        isActive &&
+          "bg-slate-700/40 rounded-lg text-white font-bold bg-orange-500"
       )}
     >
       <Icon className="w-4 h-4 shrink mr-2" />
@@ -58,23 +59,17 @@ const SidebarItem = ({
 
 const Sidebar = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { logout, accessToken } = useAuth();
-
-  const tryLogout = () => {
-    logout();
-    navigate("/");
-  };
+  const { accessToken } = useAuth();
 
   return (
     <>
-      <div className="flex flex-col lg:w-[15vw] px-1 bg-blue-500 items-center overflow-y-auto sticky top-0 hidden md:block">
-        <div className="flex flex-col mt-[40px] px-3 w-full flex-1 p-2">
+      <div className="flex flex-col lg:w-[15vw] px-1  items-center overflow-y-auto sticky top-2 hidden md:block">
+        <div className="flex flex-col mt-[40px] px-3 w-full flex-1 p-2 ">
           <SidebarItem
             to="/dashboard"
             title="Dashboard"
             Icon={LucideLayoutDashboard}
-            allowedRoles={["Admin", "Teacher"]}
+            allowedRoles={["Admin", "teacher", "Student"]}
           />
           <SidebarItem
             to="/admin/classes"
@@ -116,23 +111,47 @@ const Sidebar = () => {
             to="/teacher/class"
             title="Class"
             Icon={ClipboardIcon}
-            allowedRoles={["Teacher"]}
+            allowedRoles={["teacher"]}
           />
           <SidebarItem
             to="/teacher/complain"
             title="Complain"
             Icon={MessageCircle}
-            allowedRoles={["Teacher"]}
+            allowedRoles={["teacher"]}
+          />
+          <SidebarItem
+            to="/student/subjects"
+            title="Subjects"
+            Icon={ClipboardIcon}
+            allowedRoles={["Student"]}
+          />
+          <SidebarItem
+            to="/student/attendance"
+            title="Attendance"
+            Icon={ClipboardIcon}
+            allowedRoles={["Student"]}
+          />
+          <SidebarItem
+            to="/student/complain"
+            title="Complain"
+            Icon={MessageCircle}
+            allowedRoles={["Student"]}
           />
           {accessToken && accessToken !== "access" && (
-            <div
-              onClick={tryLogout}
-              role="button"
-              className="mt-auto px-2 flex items-center space-x-2 text-lightPink hover:bg-slate-100/10 rounded-md h-8 transition-all"
-            >
-              {/* <Logout className="w-4 h-4 shrink " /> */}
-              <p className="text-sm">Logout</p>
-            </div>
+            // <div
+            //   onClick={tryLogout}
+            //   role="button"
+            //   className="mt-2 px-2 flex items-center space-x-2 text-lightPink hover:bg-slate-100/10 rounded-md h-8 transition-all"
+            // >
+            //   {/* <Logout className="w-4 h-4 shrink " /> */}
+            //   <p className="text-sm">Logout</p>
+            // </div>
+            <SidebarItem
+              to="/logout"
+              title="Logout"
+              Icon={LogOutIcon}
+              allowedRoles={["Admin", "teacher", "Student"]}
+            />
           )}
         </div>
       </div>
@@ -146,7 +165,7 @@ const Sidebar = () => {
               to="/dashboard"
               title="Dashboard"
               Icon={LucideLayoutDashboard}
-              allowedRoles={["Admin", "Teacher"]}
+              allowedRoles={["Admin", "teacher", "Student"]}
             />
             <SidebarItem
               to="/admin/classes"
@@ -188,23 +207,39 @@ const Sidebar = () => {
               to="/teacher/class"
               title="Class"
               Icon={ClipboardIcon}
-              allowedRoles={["Teacher"]}
+              allowedRoles={["teacher"]}
             />
             <SidebarItem
               to="/teacher/complain"
               title="Complain"
               Icon={MessageCircle}
-              allowedRoles={["Teacher"]}
+              allowedRoles={["teacher"]}
+            />
+            <SidebarItem
+              to="/student/subjects"
+              title="Subjects"
+              Icon={ClipboardIcon}
+              allowedRoles={["Student"]}
+            />
+            <SidebarItem
+              to="/student/attendance"
+              title="Attendance"
+              Icon={ClipboardIcon}
+              allowedRoles={["Student"]}
+            />
+            <SidebarItem
+              to="/student/complain"
+              title="Complain"
+              Icon={MessageCircle}
+              allowedRoles={["Student"]}
             />
             {accessToken && accessToken !== "access" && (
-              <div
-                onClick={tryLogout}
-                role="button"
-                className="mt-auto px-2 flex items-center space-x-2 text-lightPink hover:bg-slate-100/10 rounded-md h-8 transition-all"
-              >
-                {/* <Logout className="w-4 h-4 shrink " /> */}
-                <p className="text-sm">Logout</p>
-              </div>
+              <SidebarItem
+                to="/logout"
+                title="Logout"
+                Icon={LogOutIcon}
+                allowedRoles={["Admin", "teacher", "Student"]}
+              />
             )}
           </div>
         </SheetContent>

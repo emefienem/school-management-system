@@ -31,6 +31,10 @@ import NotFound from "./components/NotFound";
 import TeacherClassDetails from "./components/teacher/TeacherClassDetails";
 import TeacherViewStudent from "./components/teacher/TeacherViewStudent";
 import TeacherComplain from "./components/teacher/TeacherComplain";
+import Logout from "./components/Logout";
+import StudentComplain from "./components/student/StudentComplain";
+import ViewStudentAttendance from "./components/student/ViewStudentAttendance";
+import StudentSubjects from "./components/student/StudentSubjects";
 const App = () => {
   return (
     <BrowserRouter>
@@ -40,10 +44,12 @@ const App = () => {
         <Route path="/sign" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route element={<CPDLayout />}>
+          <Route path="/logout" element={<Logout />} />
+
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute roles={["Admin", "Teacher"]}>
+              <ProtectedRoute roles={["Admin", "teacher", "Student"]}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -51,7 +57,7 @@ const App = () => {
           <Route
             path="/profile"
             element={
-              <ProtectedRoute roles={["Admin", "Teacher"]}>
+              <ProtectedRoute roles={["Admin", "teacher", "Student"]}>
                 <Profile />
               </ProtectedRoute>
             }
@@ -112,23 +118,6 @@ const App = () => {
             element={
               <ProtectedRoute roles={["Admin"]}>
                 <SubjectForm />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/subject/student/attendance/:studentID/:subjectID"
-            element={
-              <ProtectedRoute roles={["Admin", "Teacher"]}>
-                <StudentAttendance situation="Subject" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/subject/student/marks/:studentID/:subjectID"
-            element={
-              <ProtectedRoute roles={["Admin", "Teacher"]}>
-                <StudentExamMarks situation="Subject" />
               </ProtectedRoute>
             }
           />
@@ -232,6 +221,14 @@ const App = () => {
             }
           />
           <Route
+            path="/Admin/teachers/choosesubject/:id"
+            element={
+              <ProtectedRoute roles={["Admin"]}>
+                <ChooseSubject situation="Norm" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/teachers/choosesubject/:classID/:teacherID"
             element={
               <ProtectedRoute roles={["Admin"]}>
@@ -249,9 +246,27 @@ const App = () => {
           />
 
           <Route
+            path="/teacher/class/student/attendance/:studentID/:subjectID"
+            element={
+              <ProtectedRoute roles={["teacher"]}>
+                <StudentAttendance situation="Subject" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/teacher/class/student/marks/:studentID/:subjectID"
+            element={
+              <ProtectedRoute roles={["teacher"]}>
+                <StudentExamMarks situation="Subject" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/teacher/complain"
             element={
-              <ProtectedRoute roles={["Teacher"]}>
+              <ProtectedRoute roles={["teacher"]}>
                 <TeacherComplain />
               </ProtectedRoute>
             }
@@ -260,7 +275,7 @@ const App = () => {
           <Route
             path="/teacher/class"
             element={
-              <ProtectedRoute roles={["Teacher"]}>
+              <ProtectedRoute roles={["teacher"]}>
                 <TeacherClassDetails />
               </ProtectedRoute>
             }
@@ -268,8 +283,32 @@ const App = () => {
           <Route
             path="/teacher/class/student/:id"
             element={
-              <ProtectedRoute roles={["Teacher"]}>
+              <ProtectedRoute roles={["teacher"]}>
                 <TeacherViewStudent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/subjects"
+            element={
+              <ProtectedRoute roles={["Student"]}>
+                <StudentSubjects />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/attendance"
+            element={
+              <ProtectedRoute roles={["Student"]}>
+                <ViewStudentAttendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/complain"
+            element={
+              <ProtectedRoute roles={["Student"]}>
+                <StudentComplain />
               </ProtectedRoute>
             }
           />

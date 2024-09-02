@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/api/useAuth";
 import {
   GraduationCapIcon,
@@ -9,14 +9,27 @@ import {
   Book,
   FileText,
   Clock,
+  ArrowLeft,
+  Loader,
 } from "lucide-react";
 import SeeNotice from "../components/admin/SeeNotice";
 import CountUp from "react-countup";
 import AuthorizedComponent from "./AuthorizedComponent";
+import { calculateOverallAttendancePercentage } from "./function/AttendanceFunction";
+import { useNavigate } from "react-router";
+import PieCharts from "./function/PieChart";
+
+interface Teacher {
+  id: string;
+  name: string;
+  teachSubject?: { subName: string };
+  teachSclass: { sclassName: string; id: string };
+}
 
 const Dashboard = () => {
   const {
     currentUser,
+    currentRole,
     subjectDetails,
     sclassStudents,
     getSubjectDetails,
@@ -26,16 +39,33 @@ const Dashboard = () => {
     getAllTeachers,
     studentsList,
     sclasses,
+    teachersList,
+    subjectsList,
+    userDetails,
+    getUserDetails,
+    getSubjectList,
+    loading,
+    getresponse,
   } = useAuth();
 
-  const ID = currentUser.user.id;
-  const classID = currentUser?.teachSclass?.id;
-  const subjectID = currentUser?.teachSubject?.id;
+  const navigate = useNavigate();
+  const ID =
+    currentRole === "Admin" || currentRole === "Student"
+      ? currentUser?.user?.id
+      : currentUser?.user?.schoolId;
+  const teachSclassID = currentUser?.user?.teachSclassId;
+  const teachSubjectID = currentUser?.user?.teachSubjectId;
+
+  const [subjectAttendance, setSubjectAttendance] = useState<any[]>([]);
+  const classID = currentUser?.user?.sclassId;
 
   useEffect(() => {
-    if (subjectID) getSubjectDetails(subjectID, "subject");
-    if (classID) getClassStudents(classID, "class");
-  }, [subjectID, classID]);
+    if (currentRole === "teacher") {
+      if (teachSubjectID) getSubjectDetails(teachSubjectID, "subject");
+      if (teachSclassID) getClassStudents(teachSclassID, "class");
+      console.log(teachSclassID, teachSubjectID);
+    }
+  }, [teachSubjectID, teachSclassID]);
 
   useEffect(() => {
     if (ID) {
@@ -45,16 +75,43 @@ const Dashboard = () => {
     }
   }, [ID, getAllStudents, getAllSclasses, getAllTeachers]);
 
+  useEffect(() => {
+    if (currentRole === "teacher") {
+      getUserDetails(currentUser.user.id, "teacher");
+      getSubjectList(teachSclassID, "subject");
+    } else if (currentRole === "Student") {
+      getUserDetails(currentUser.user.id, "student");
+      getSubjectList(classID, "subject");
+    }
+  }, [currentUser.user.id, teachSclassID]);
+
+  useEffect(() => {
+    if (userDetails) {
+      setSubjectAttendance(userDetails.attendance || []);
+    }
+  }, [userDetails]);
+
+  // Admin
   const numberOfStudent = studentsList && studentsList.length;
   const numberOfClasses = sclasses && sclasses.length;
-  const numberOfTeachers = 3;
-
+  const numberOfTeachers = teachersList && teachersList.length;
+  //Teacher
   const numberOfStudents = sclassStudents?.length || 0;
   const numberOfSessions = subjectDetails?.sessions || 0;
+  // Student
+  const numberOfSubjects = subjectsList && subjectsList.length;
+
+  const overallAttendancePercentage =
+    calculateOverallAttendancePercentage(subjectAttendance);
+  const overallAbsentPercentage = 100 - overallAttendancePercentage;
+
+  const chartData = [
+    { name: "Present", value: overallAttendancePercentage },
+    { name: "Absent", value: overallAbsentPercentage },
+  ];
 
   return (
     <div className="container mx-auto mt-4 mb-4">
-      <p> Dashboard</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <AuthorizedComponent roles={["Admin"]}>
           <div className="bg-white shadow-md rounded-lg p-6 text-center">
@@ -100,7 +157,7 @@ const Dashboard = () => {
           </div>
         </AuthorizedComponent>
 
-        <AuthorizedComponent roles={["Teacher"]}>
+        <AuthorizedComponent roles={["teacher"]}>
           <Card
             icon={<Users size={32} />}
             title="Class Students"
@@ -127,10 +184,42 @@ const Dashboard = () => {
             suffix="hrs"
           />
         </AuthorizedComponent>
+
+        <AuthorizedComponent roles={["Student"]}>
+          <Card
+            icon={<Book size={32} />}
+            title="Total Subjects"
+            count={numberOfSubjects}
+            duration={2.5}
+          />
+          <Card
+            icon={<Book size={32} />}
+            title="Total Assignment"
+            count={15}
+            duration={4}
+          />
+        </AuthorizedComponent>
       </div>
       <div className="mt-4 p-4 bg-white shadow rounded">
         <SeeNotice />
       </div>
+      <AuthorizedComponent roles={["Student"]}>
+        <div className="p-4 bg-white shadow rounded flex flex-col items-center text-center h-52">
+          <div className="h-48 flex items-center justify-center">
+            {getresponse ? (
+              <p className="text-lg">No Attendance Found</p>
+            ) : loading ? (
+              <div className="flex justify-center items-center h-screen">
+                <Loader className="animate-spin w-12 h-12 text-purple-600" />
+              </div>
+            ) : subjectAttendance.length > 0 ? (
+              <PieCharts data={chartData} />
+            ) : (
+              <p className="text-lg">No Attendance Found</p>
+            )}
+          </div>
+        </div>
+      </AuthorizedComponent>
     </div>
   );
 };

@@ -99,7 +99,7 @@ const subjectCtrl = {
       const { id } = req.params;
 
       const subjects = await prisma.subject.findMany({
-        where: { sclassNameId: parseInt(id), teacherId: null },
+        where: { sclassId: parseInt(id), teacherId: null },
       });
 
       if (subjects.length > 0) {
@@ -108,7 +108,7 @@ const subjectCtrl = {
         res.send({ message: "No subjects found" });
       }
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json({ error: err.message });
     }
   },
 

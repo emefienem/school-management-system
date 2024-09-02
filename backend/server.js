@@ -26,6 +26,7 @@ app.use("/student", require("./routers/studentRoute"));
 app.use("/subject", require("./routers/subjectRoute"));
 app.use("/class", require("./routers/classRoute"));
 app.use("/complain", require("./routers/complainRoute"));
+app.use("/notice", require("./routers/noticeRoute"));
 
 app.use("/auth", require("./routers/refreshRoute"));
 

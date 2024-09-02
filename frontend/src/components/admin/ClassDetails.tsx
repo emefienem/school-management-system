@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { Trash2, PlusCircle, UserPlus, UserX } from "lucide-react";
+import { Trash2, PlusCircle, UserPlus, UserX, Loader } from "lucide-react";
 import Popup from "../function/Popup";
 import { useAuth } from "@/api/useAuth";
 import QuickActionDial from "../function/QuickActionDial";
@@ -285,7 +285,9 @@ const ClassDetails = () => {
   return (
     <>
       {loading ? (
-        <div className="text-center mt-10">Loading...</div>
+        <div className="flex justify-center items-center h-screen">
+          <Loader className="animate-spin w-12 h-12 text-purple-600" />
+        </div>
       ) : (
         <div className="w-full">
           <Tabs selectedIndex={value} onSelect={(index) => setValue(index)}>

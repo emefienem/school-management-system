@@ -26,7 +26,8 @@ model Admin {
   parents    Parent[]
   subjects   Subject[]
   sclasses   Sclass[]
-  complains  Complain[] 
+  complains  Complain[]
+  notices    Notice[]
 }
 
 model Teacher {
@@ -147,6 +148,17 @@ model Complain {
   userId    Int
   date      DateTime
   complaint String
+  school    Admin    @relation(fields: [schoolId], references: [id])
+  schoolId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notice {
+  id        Int      @id @default(autoincrement())
+  title     String
+  details   String
+  date      DateTime
   school    Admin    @relation(fields: [schoolId], references: [id])
   schoolId  Int
   createdAt DateTime @default(now())

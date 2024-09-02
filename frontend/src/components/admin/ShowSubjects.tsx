@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash } from "lucide-react";
+import { ArrowLeft, Loader, Plus, Trash } from "lucide-react";
 import TableTemplate from "../function/DataTable";
 import Popup from "../function/Popup";
 import { useAuth } from "../../api/useAuth";
@@ -106,11 +106,24 @@ const ShowSubjects: React.FC = () => {
   return (
     <>
       {loading ? (
-        <div className="text-center mt-8">
-          <img src={SLG} alt="Loading" className="animate-spin h-16 w-16" />
-        </div>
+        <>
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+          <div className="text-center flex justify-center items-center py-4">
+            <div className="flex justify-center items-center h-screen">
+              <Loader className="animate-spin w-12 h-12 text-purple-600" />
+            </div>
+          </div>
+        </>
       ) : (
         <>
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+
           {getresponse ? (
             <div className="flex justify-end mt-4">
               <button

@@ -14,13 +14,16 @@ interface AuthState {
   darkMode: boolean;
   accessToken: string;
   refreshToken: string;
+  teacherDetails: any;
   subjectDetails: any;
   sclassDetails: any;
   sclassStudents: any[];
   subjectList: any[];
   sclasses: any[];
+  teachersList: any[];
   studentsList: any[];
   complainList: any[];
+  noticeList: any[];
   authRequest: () => void;
   authSuccess: (user: any) => void;
   authFailed: (error: string) => void;
@@ -60,6 +63,7 @@ interface AuthState {
   getSubjectDetails: (id: string, address: string) => Promise<void>;
   resetAuthStatus: () => void;
   getAllComplains: (id: string, address: string) => Promise<void>;
+  getAllNotices: (id: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -77,13 +81,16 @@ export const useAuthStore = create<AuthState>()(
       darkMode: true,
       accessToken: "",
       refreshToken: "",
+      teacherDetails: null,
       subjectDetails: null,
       sclassDetails: null,
       sclassStudents: [],
       subjectList: [],
       sclasses: [],
+      teachersList: [],
       studentsList: [],
       complainList: [],
+      noticeList: [],
       authRequest: () => set({ status: "loading" }),
       authSuccess: (user) => {
         set({
@@ -164,6 +171,13 @@ export const useAuthStore = create<AuthState>()(
               status: "added",
               response:
                 result.data.message || "Student registered successfully",
+            });
+          } else if (role === "teacher" && result.data.id) {
+            // Student registration
+            set({
+              status: "added",
+              response:
+                result.data.message || "Teacher registered successfully",
             });
           } else if (result.data.school) {
             // Temporary details handling (if needed)
@@ -274,7 +288,7 @@ export const useAuthStore = create<AuthState>()(
           if (result.data.message) {
             set({ response: result.data.message, loading: false });
           } else {
-            set({ userDetails: result.data, loading: false });
+            set({ teachersList: result.data, loading: false });
           }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
@@ -283,9 +297,9 @@ export const useAuthStore = create<AuthState>()(
       getTeacherDetails: async (id) => {
         set({ loading: true });
         try {
-          const result = await axios.get(`${apiUrl}/teacher/get-details/${id}`);
+          const result = await axios.get(`${apiUrl}/teacher/infor/${id}`);
           if (result.data) {
-            set({ tempDetails: result.data, loading: false });
+            set({ teacherDetails: result.data, loading: false });
           }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
@@ -450,7 +464,7 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true });
         try {
           const result = await axios.get(
-            `${apiUrl}/teacher/free-subject-list/${id}`
+            `${apiUrl}/subject/free-subject-list/${id}`
           );
           if (result.data.message) {
             set({ response: result.data.message, loading: false });
@@ -480,12 +494,36 @@ export const useAuthStore = create<AuthState>()(
           const result = await axios.get(`${apiUrl}/${address}/list/${id}`);
           if (result.data.message) {
             set({
-              error: result.data.message,
+              response: result.data.message,
               loading: false,
             });
           } else {
             set({
               complainList: result.data,
+              loading: false,
+              error: null,
+            });
+          }
+        } catch (error: any) {
+          set({
+            error: error.message || "Unknown error",
+            loading: false,
+          });
+        }
+      },
+
+      getAllNotices: async (id) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(`${apiUrl}/notice/list/${id}`);
+          if (result.data.message) {
+            set({
+              response: result.data.message,
+              loading: false,
+            });
+          } else {
+            set({
+              noticeList: result.data,
               loading: false,
               error: null,
             });
@@ -522,6 +560,7 @@ axios.interceptors.response.use(
         const response = await axios.post(`${apiUrl}/auth/refresh-token`, {
           token: refreshToken,
         });
+        console.log(response);
         const newAccessToken = response.data.accessToken;
         const newRefreshToken = response.data.refreshToken;
         useAuthStore.setState({
