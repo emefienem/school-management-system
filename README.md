@@ -33,7 +33,7 @@ This School Management System enhances communication and interaction between par
     
 ## Technologies Used
 
-- **Frontend:** Vite, React(TypeScript and JavaScript), Zustand, Axios
+- **Frontend:** Vite, React(TypeScript), Zustand, Axios
 - **Backend:** Node.js, Express, PostgreSQL with Prisma
 - **Authentication:** JWT
 
