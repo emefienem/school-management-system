@@ -91,7 +91,7 @@ const ViewStudent: React.FC = () => {
     if (userDetails) {
       setName(userDetails.name || "");
       setRollNum(userDetails.rollNum || "");
-      setSclass(userDetails.sclass);
+      setSclass(userDetails.sclass || "");
       setStudentSchool(userDetails.school || { schoolName: "" });
       setSubjectMarks(userDetails.examResults || {});
       setSubjectAttendance(userDetails.attendance || []);

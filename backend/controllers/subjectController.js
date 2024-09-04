@@ -115,6 +115,8 @@ const subjectCtrl = {
   getSubjectDetail: async (req, res) => {
     try {
       const { id } = req.params;
+      console.log(id);
+
       const subject = await prisma.subject.findUnique({
         where: { id: parseInt(id) },
         include: { sclass: true, teacher: true },
@@ -133,30 +135,26 @@ const subjectCtrl = {
   deleteSubject: async (req, res) => {
     try {
       const { id } = req.params;
+      await prisma.teacher.updateMany({
+        where: { teachSubjectId: parseInt(id) },
+        data: { teachSubjectId: null },
+      });
+
+      await prisma.examResult.deleteMany({
+        where: { subNameId: parseInt(id) },
+      });
+
+      await prisma.attendance.deleteMany({
+        where: { subNameId: parseInt(id) },
+      });
 
       const deletedSubject = await prisma.subject.delete({
         where: { id: parseInt(id) },
       });
 
-      // the teachSubject field is set to null in teachers
-      await prisma.teacher.updateMany({
-        where: { teachSubjectId: deletedSubject.id },
-        data: { teachSubjectId: null },
-      });
-
-      // The objects containing the deleted subject is removed from students' examResult array
-      await prisma.examResult.deleteMany({
-        where: { subNameId: deletedSubject.id },
-      });
-
-      // Remove the objects containing the deleted subject from students' attendance array
-      await prisma.attendance.deleteMany({
-        where: { subNameId: deletedSubject.id },
-      });
-
       res.send(deletedSubject);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 

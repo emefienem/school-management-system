@@ -8,6 +8,7 @@ const ViewSubject: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams<{ classID: string; subjectID: string }>();
   const {
+    currentUser,
     loading,
     subjectDetails,
     sclassStudents,
@@ -15,14 +16,17 @@ const ViewSubject: React.FC = () => {
     error,
     getClassStudents,
     getSubjectDetails,
+    getSubjectList,
+    subjectsList,
   } = useAuth();
 
+  const ID = currentUser?.user?.id;
   const { classID, subjectID } = params;
-
   useEffect(() => {
     if (subjectID && classID) {
-      getSubjectDetails(subjectID, "subject");
+      getSubjectDetails(subjectID!, "subject");
       getClassStudents(classID, "class");
+      getSubjectList(ID, "subject");
       console.log(subjectDetails);
     }
   }, [subjectID, classID]);
@@ -146,7 +150,7 @@ const ViewSubject: React.FC = () => {
         <h4 className="text-2xl font-bold mb-4 text-blue-500 text-start">
           Subject Details
         </h4>
-        <p className="text-lg mb-2 uppercase font-bold">
+        <p className="text-lg mb-2 font-bold">
           Subject Name:{" "}
           <span className="text-blue-500">
             {subjectDetails?.subName || "N/A"}
@@ -168,7 +172,7 @@ const ViewSubject: React.FC = () => {
           Number of Students:{" "}
           <span className="text-blue-500">{numberOfStudents}</span>{" "}
         </p>
-        <p className="text-lg mb-2 uppercase font-bold">
+        <p className="text-lg mb-2  font-bold">
           Class Name:{" "}
           <span className="text-blue-500">
             {subjectDetails?.sclass?.sclassName || "N/A"}

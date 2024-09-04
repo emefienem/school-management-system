@@ -9,7 +9,7 @@ router.get("/class-subjects/:id", subjectCtrl.classSubjects);
 router.get("/free-subject-list/:id", subjectCtrl.freeSubjectList);
 router.get("/subject/:id", subjectCtrl.getSubjectDetail);
 
-router.delete("/delete-subject/:id", subjectCtrl.deleteSubject);
+router.delete("/delete/:id", subjectCtrl.deleteSubject);
 router.delete("/delete-many-subjects/:id", subjectCtrl.deleteManySubjects);
 router.delete(
   "/delete-subjects-by-class/:id",

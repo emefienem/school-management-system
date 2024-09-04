@@ -85,24 +85,25 @@ const classCtrl = {
   deleteClass: async (req, res) => {
     try {
       const { id } = req.params;
+
+      await prisma.student.deleteMany({
+        where: { sclassId: parseInt(id) },
+      });
+      await prisma.subject.deleteMany({
+        where: { sclassId: parseInt(id) },
+      });
+      await prisma.teacher.updateMany({
+        where: { teachSclassId: parseInt(id) },
+        data: { teachSclassId: null },
+      });
+
       const deletedClass = await prisma.sclass.delete({
         where: { id: parseInt(id) },
       });
 
-      await prisma.student.deleteMany({
-        where: { sclassId: deletedClass.id },
-      });
-      await prisma.subject.deleteMany({
-        where: { sclassNameId: deletedClass.id },
-      });
-      await prisma.teacher.updateMany({
-        where: { teachSclassId: deletedClass.id },
-        data: { teachSclassId: null },
-      });
-
       res.send(deletedClass);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 

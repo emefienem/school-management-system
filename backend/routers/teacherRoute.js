@@ -10,7 +10,7 @@ router.get("/infor/:id", teacherCtrl.getTeacherDetail);
 
 router.delete("/delete-many-teachers/:id", teacherCtrl.deleteTeachers);
 router.delete("/teachers-by-class/:id", teacherCtrl.deleteTeachersByClass);
-router.delete("/delete-teacher/:id", teacherCtrl.deleteTeacher);
+router.delete("/delete/:id", teacherCtrl.deleteTeacher);
 
 router.put("/update-teacher-subject", teacherCtrl.updateTeacherSubject);
 

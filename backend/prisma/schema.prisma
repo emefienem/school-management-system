@@ -40,8 +40,8 @@ model Teacher {
   teachSubjectId  Int?           @unique
   teachSubject    Subject?       @relation(fields: [teachSubjectId], references: [id])
   schoolId        Int
-  teachSclass     Sclass         @relation("TeacherSclass", fields: [teachSclassId], references: [id])
-  teachSclassId   Int
+  teachSclass     Sclass?        @relation("TeacherSclass", fields: [teachSclassId], references: [id])
+  teachSclassId   Int?
   attendance      Attendance[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

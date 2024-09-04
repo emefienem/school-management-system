@@ -46,11 +46,11 @@ const ShowClasses = () => {
   const deleteHandler = async (deleteID: any, address: string) => {
     console.log(deleteID);
     console.log(address);
-    setMessage("Sorry the delete function has been disabled for now.");
-    setShowPopup(true);
-    // await deleteUser(deleteID, address).then(() => {
-    //   getAllSclasses(ID, "class");
-    // });
+    // setMessage("Sorry the delete function has been disabled for now.");
+    // setShowPopup(true);
+    await deleteUser(deleteID, address).then(() => {
+      getAllSclasses(ID, "class");
+    });
   };
 
   const sclassColumns = [{ id: "name", label: "Class Name", minWidth: 170 }];
@@ -151,7 +151,7 @@ const ShowClasses = () => {
     {
       icon: <XCircle className="text-red-600" />,
       name: "Delete All Classes",
-      action: () => deleteHandler(ID, "classes"),
+      action: () => deleteHandler(ID, "class"),
     },
   ];
   return (

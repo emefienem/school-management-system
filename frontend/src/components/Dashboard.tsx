@@ -16,10 +16,12 @@ import SeeNotice from "../components/admin/SeeNotice";
 import CountUp from "react-countup";
 import AuthorizedComponent from "./AuthorizedComponent";
 import { calculateOverallAttendancePercentage } from "./function/AttendanceFunction";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import PieCharts from "./function/PieChart";
 
 const Dashboard = () => {
+  const params = useParams<{ id: string }>();
+
   const {
     currentUser,
     currentRole,
@@ -40,8 +42,8 @@ const Dashboard = () => {
     loading,
     getresponse,
   } = useAuth();
+  const studentID = params.id!;
 
-  const navigate = useNavigate();
   const ID =
     currentRole === "Admin"
       ? currentUser?.user?.id
@@ -51,13 +53,13 @@ const Dashboard = () => {
 
   const [subjectAttendance, setSubjectAttendance] = useState<any[]>([]);
   const classID = currentUser?.user?.sclassId;
-
+  // const classID = currentUser?.user?.id;
   useEffect(() => {
-    if (currentRole === "teacher") {
-      if (teachSubjectID) getSubjectDetails(teachSubjectID, "subject");
-      if (teachSclassID) getClassStudents(teachSclassID, "class");
-      console.log(teachSclassID, teachSubjectID);
-    }
+    // if (currentRole === "teacher") {
+    if (teachSubjectID) getSubjectDetails(teachSubjectID, "subject");
+    if (teachSclassID) getClassStudents(teachSclassID, "class");
+    console.log(teachSclassID, teachSubjectID);
+    // }
   }, [teachSubjectID, teachSclassID]);
 
   useEffect(() => {
@@ -65,18 +67,16 @@ const Dashboard = () => {
       getAllStudents(ID);
       getAllSclasses(ID, "class");
       getAllTeachers(ID);
+      // getSubjectList(ID, "subject");
     }
-  }, [ID, getAllStudents, getAllSclasses, getAllTeachers]);
+  }, [ID]);
 
   useEffect(() => {
-    if (currentRole === "teacher") {
-      getUserDetails(currentUser.user.id, "teacher");
-      getSubjectList(teachSclassID, "subject");
-    } else if (currentRole === "Student") {
+    if (currentRole === "Student") {
       getUserDetails(currentUser.user.id, "student");
       getSubjectList(classID, "subject");
     }
-  }, [currentUser.user.id, teachSclassID]);
+  }, [currentUser.user.id]);
 
   useEffect(() => {
     if (userDetails) {

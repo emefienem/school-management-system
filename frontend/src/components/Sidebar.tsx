@@ -44,7 +44,7 @@ const SidebarItem = ({
       role="button"
       onClick={() => navigate(to)}
       className={`w-full px-2 text-black flex items-center h-10 my-2 transition-all duration-75 ease-in-out ${
-        isActive ? "bg-orange-500 text-white font-bold" : ""
+        isActive ? "bg-orange-500 text-white font-bold rounded-xl" : ""
       }`}
     >
       <Icon className="w-4 h-4 shrink mr-2" />
@@ -144,7 +144,7 @@ const Sidebar = () => {
       </div>
 
       <Sheet>
-        <SheetTrigger className="fixed top-4 left-4 w-8 h-8 bg-blue-500 text-white rounded flex items-center justify-center md:hidden z-50">
+        <SheetTrigger className="fixed top-4 left-4 w-8 h-8 bg-orange-500 text-white  flex items-center justify-center md:hidden z-50 rounded-lg">
           <BsThreeDots />
         </SheetTrigger>
         <SheetContent side="left" className="p-4 bg-white text-black">

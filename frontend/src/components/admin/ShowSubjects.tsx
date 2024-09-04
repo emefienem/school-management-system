@@ -20,6 +20,7 @@ interface Subject {
 const ShowSubjects: React.FC = () => {
   const {
     currentUser,
+    deleteUser,
     getSubjectList,
     loading,
     error,
@@ -46,11 +47,14 @@ const ShowSubjects: React.FC = () => {
   //   );
   // }
 
-  const deleteHandler = (deleteID: string, address: string) => {
+  const deleteHandler = async (deleteID: string, address: string) => {
     console.log(deleteID);
     console.log(address);
-    setMessage("Sorry, the delete function has been disabled for now.");
-    setShowPopup(true);
+    // setMessage("Sorry, the delete function has been disabled for now.");
+    // setShowPopup(true);
+    await deleteUser(deleteID, address).then(() => {
+      getSubjectList(ID, "subject");
+    });
   };
 
   const subjectColumns = [
@@ -73,7 +77,7 @@ const ShowSubjects: React.FC = () => {
     return (
       <>
         <button
-          onClick={() => deleteHandler(row.id, "Subject")}
+          onClick={() => deleteHandler(row.id, "subject")}
           className="text-red-500 hover:text-red-700"
         >
           <Trash size={20} />

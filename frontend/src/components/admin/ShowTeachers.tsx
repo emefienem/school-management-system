@@ -83,12 +83,12 @@ const ShowTeachers: React.FC = () => {
   const deleteHandler = (deleteID: string, address: string) => {
     console.log(deleteID);
     console.log(address);
-    setMessage("Sorry, the delete function has been disabled for now.");
-    setShowPopup(true);
+    // setMessage("Sorry, the delete function has been disabled for now.");
+    // setShowPopup(true);
 
-    // dispatch(deleteUser(deleteID, address)).then(() => {
-    //     dispatch(getAllTeachers(ID));
-    // });
+    deleteUser(deleteID, address).then(() => {
+      getAllTeachers(ID);
+    });
   };
 
   const columns: Column[] = [
@@ -100,8 +100,8 @@ const ShowTeachers: React.FC = () => {
   const rows = teachersList.map((teacher: Teacher) => ({
     name: teacher.name,
     teachSubject: teacher.teachSubject?.subName || null,
-    teachSclass: teacher.teachSclass.sclassName,
-    teachSclassID: teacher.teachSclass.id,
+    teachSclass: teacher.teachSclass?.sclassName || "",
+    teachSclassID: teacher.teachSclass?.id,
     id: teacher.id,
   }));
 

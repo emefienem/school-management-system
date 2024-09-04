@@ -32,6 +32,7 @@ const ClassDetails = () => {
   const params = useParams<Params>();
   const navigate = useNavigate();
   const {
+    currentUser,
     subjectsList,
     sclassStudents,
     sclassDetails,
@@ -43,11 +44,12 @@ const ClassDetails = () => {
     getSubjectList,
   } = useAuth();
 
-  const classID = params.id;
+  const classID = params.id!;
+  const ID = currentUser?.user?.id;
   useEffect(() => {
     if (classID) {
       getClassDetails(classID, "class");
-      getSubjectList(classID, "subject");
+      getSubjectList(ID, "subject");
       getClassStudents(classID, "class");
     }
   }, [classID, getClassStudents, getSubjectList, getClassDetails]);
@@ -244,7 +246,7 @@ const ClassDetails = () => {
           Class Details
         </h1>
         <div className="text-center space-y-12">
-          <h2 className="text-xl font-semibold mb-2 uppercase">
+          <h2 className="text-xl font-semibold mb-2">
             class{" "}
             <span className="text-blue-500 font-bold">
               {sclassDetails && sclassDetails.sclassName}

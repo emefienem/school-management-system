@@ -8,7 +8,11 @@ interface ChooseSubjectProps {
 }
 
 const ChooseSubject: React.FC<ChooseSubjectProps> = ({ situation }) => {
-  const params = useParams<{ id: string; teacherID?: string }>();
+  // const params = useParams<{ sclassId: string; teacherID?: string }>();
+
+  // const params = useParams<{ id: string }>();
+  const params = useParams();
+
   const navigate = useNavigate();
 
   const [classID, setClassID] = useState<string>("");
@@ -29,9 +33,10 @@ const ChooseSubject: React.FC<ChooseSubjectProps> = ({ situation }) => {
       setClassID(params.id!);
       getTeacherFreeClassSubjects(params.id!);
     } else if (situation === "Teacher") {
-      setClassID(params.teacherID!);
-      setTeacherID(params.id!);
-      getTeacherFreeClassSubjects(params.id!);
+      const { classID, teacherID } = params;
+      setClassID(classID!);
+      setTeacherID(teacherID!);
+      getTeacherFreeClassSubjects(classID!);
     }
   }, [situation, params]);
 

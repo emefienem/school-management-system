@@ -68,7 +68,7 @@ export const useAuth = () => {
     addStuff: state.addStuff,
     resetAuthStatus: state.resetAuthStatus,
     getSubjectList: state.getSubjectList,
-    subjectsList: state.subjectList,
+    subjectsList: state.subjectsList,
     sclasses: state.sclasses,
     teachersList: state.teachersList,
     studentsList: state.studentsList,
