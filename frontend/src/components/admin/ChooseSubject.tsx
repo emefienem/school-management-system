@@ -8,9 +8,6 @@ interface ChooseSubjectProps {
 }
 
 const ChooseSubject: React.FC<ChooseSubjectProps> = ({ situation }) => {
-  // const params = useParams<{ sclassId: string; teacherID?: string }>();
-
-  // const params = useParams<{ id: string }>();
   const params = useParams();
 
   const navigate = useNavigate();

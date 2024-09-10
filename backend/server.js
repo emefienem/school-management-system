@@ -2,14 +2,15 @@ require("dotenv").config;
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 const { Client } = require("pg");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const app = express();
 
+app.use(bodyParser.json());
 app.use(express.json());
-// app.use(cors());
 app.use(
   cors({
     origin: ["http://localhost:5173"],
@@ -18,7 +19,7 @@ app.use(
 );
 app.use(cookieParser("secret"));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.use("/admin", require("./routers/adminRoute"));
 app.use("/teacher", require("./routers/teacherRoute"));

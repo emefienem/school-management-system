@@ -14,8 +14,8 @@ export const groupAttendanceBySubject = (subjectAttendance) => {
 
   subjectAttendance.forEach((attendance) => {
     const subName = attendance.subName.subName;
-    const sessions = attendance.subName.sessions;
-    const subId = attendance.subName._id;
+    const sessions = attendance.sessions;
+    const subId = attendance.subNameId;
 
     if (!attendanceBySubject[subName]) {
       attendanceBySubject[subName] = {
@@ -45,9 +45,9 @@ export const calculateOverallAttendancePercentage = (subjectAttendance) => {
   const uniqueSubIds = [];
 
   subjectAttendance.forEach((attendance) => {
-    const subId = attendance.subName._id;
+    const subId = attendance.subNameId;
     if (!uniqueSubIds.includes(subId)) {
-      const sessions = parseInt(attendance.subName.sessions);
+      const sessions = parseInt(attendance.sessions);
       totalSessionsSum += sessions;
       uniqueSubIds.push(subId);
     }

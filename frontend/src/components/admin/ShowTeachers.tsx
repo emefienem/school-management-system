@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { getAllTeachers } from "../../../redux/teacherRelated/teacherHandle";
-// import { deleteUser } from "../../../redux/userRelated/userHandle";
 import { ArrowLeft, Loader, UserMinus, UserPlus } from "lucide-react";
 import TableTemplate from "../function/DataTable";
 import Popup from "../function/Popup";

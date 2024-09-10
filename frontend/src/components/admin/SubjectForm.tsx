@@ -22,8 +22,14 @@ const SubjectForm: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const { status, currentUser, getresponse, error, resetAuthStatus, addStuff } =
-    useAuth();
+  const {
+    getstatus,
+    currentUser,
+    getresponse,
+    error,
+    resetAuthStatus,
+    addStuff,
+  } = useAuth();
 
   const sclassName = params.id || "";
   const adminID = currentUser.user.id;
@@ -88,20 +94,20 @@ const SubjectForm: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "added") {
+    if (getstatus === "added") {
       navigate("/admin/subjects");
       resetAuthStatus();
       setLoader(false);
-    } else if (status === "failed") {
+    } else if (getstatus === "failed") {
       setMessage(getresponse ?? "An error occurred");
       setShowPopup(true);
       setLoader(false);
-    } else if (status === "error") {
+    } else if (getstatus === "error") {
       setMessage("Network Error");
       setShowPopup(true);
       setLoader(false);
     }
-  }, [status, navigate, error, getresponse]);
+  }, [getstatus, navigate, error, getresponse]);
 
   return (
     <form onSubmit={submitHandler} className="space-y-4 p-4">

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import { deleteUser } from "../../../redux/userRelated/userHandle";
 import { useNavigate, useParams } from "react-router-dom";
-// import { getSubjectList } from "../../../redux/sclassRelated/sclassHandle";
 import {
   Trash,
   ChevronDown,
@@ -34,8 +32,10 @@ const ViewStudent: React.FC = () => {
     error,
     getUserDetails,
     updateUser,
+    removeAtten,
     getSubjectList,
     currentUser,
+    deleteUser,
   } = useAuth();
 
   const studentID = params.id!;
@@ -121,11 +121,7 @@ const ViewStudent: React.FC = () => {
   // };
 
   const removeSubAttendance = (subId: string) => {
-    updateUser(
-      studentID,
-      JSON.stringify({ subId }),
-      "RemoveStudentSubAtten"
-    ).then(() => {
+    removeAtten(studentID, subId, "student").then(() => {
       getUserDetails(studentID, address);
     });
   };

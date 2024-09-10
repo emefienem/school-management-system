@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TableTemplate from "../function/DataTable";
-import { Car, BarChart, Loader, ArrowLeft } from "lucide-react";
+import { Car, BarChart, Loader, ArrowLeft, EyeIcon } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
 
 const ViewSubject: React.FC = () => {
@@ -16,18 +16,18 @@ const ViewSubject: React.FC = () => {
     error,
     getClassStudents,
     getSubjectDetails,
-    getSubjectList,
-    subjectsList,
+    sclassDetails,
   } = useAuth();
 
   const ID = currentUser?.user?.id;
-  const { classID, subjectID } = params;
+  const { subjectID } = params;
+  const classID = sclassDetails?.id;
   useEffect(() => {
     if (subjectID && classID) {
       getSubjectDetails(subjectID!, "subject");
-      getClassStudents(classID, "class");
-      getSubjectList(ID, "subject");
-      console.log(subjectDetails);
+      getClassStudents(classID!, "class");
+      console.log(classID);
+      console.log(getresponse);
     }
   }, [subjectID, classID]);
 
@@ -55,14 +55,13 @@ const ViewSubject: React.FC = () => {
   const StudentsAttendanceButtonHaver: React.FC<{ row: { id: string } }> = ({
     row,
   }) => (
-    <div className="flex space-x-2">
+    <div className="flex space-x-6 xl:ml-52">
       <button onClick={() => navigate(`/admin/students/student/${row.id}`)}>
-        View
+        <EyeIcon className="text-blue-500" />
       </button>
       <button
-        onClick={() =>
-          navigate(`/admin/subject/student/attendance/${row.id}/${subjectID}`)
-        }
+        onClick={() => navigate(`/admin/students/student/attendance/${row.id}`)}
+        className="bg-black text-white px-4 py-2"
       >
         Take Attendance
       </button>
@@ -202,16 +201,17 @@ const ViewSubject: React.FC = () => {
   return (
     <div>
       {loading ? (
-        <div className="text-center flex justify-center items-center py-4">
+        <>
           <ArrowLeft
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white mb-8"
           />
-
-          <div className="flex justify-center items-center h-screen">
-            <Loader className="animate-spin w-12 h-12 text-purple-600" />
+          <div className="text-center flex justify-center items-center py-4">
+            <div className="flex justify-center items-center h-screen">
+              <Loader className="animate-spin w-12 h-12 text-purple-600" />
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <div className="w-full">
           <div className="border-b border-gray-300">

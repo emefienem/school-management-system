@@ -85,6 +85,12 @@ const Sidebar = () => {
             allowedRoles={["Admin"]}
           />
           <SidebarItem
+            to="/admin/parents"
+            title="Parents"
+            Icon={ClipboardIcon}
+            allowedRoles={["Admin"]}
+          />
+          <SidebarItem
             to="/admin/students"
             title="Students"
             Icon={ClipboardIcon}
@@ -170,6 +176,12 @@ const Sidebar = () => {
             <SidebarItem
               to="/admin/teachers"
               title="Teachers"
+              Icon={ClipboardIcon}
+              allowedRoles={["Admin"]}
+            />
+            <SidebarItem
+              to="/admin/parents"
+              title="Parents"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
             />

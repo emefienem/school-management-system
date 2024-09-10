@@ -1,59 +1,80 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import TableTemplate from "../function/DataTable";
+import React, { useEffect, useState, useRef, MouseEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowUp,
-  ChevronDown,
+  XCircle,
+  PlusCircle,
   ChevronUp,
+  ChevronDown,
   EyeIcon,
+  ArrowLeft,
   Loader,
 } from "lucide-react";
+import Popup from "../function/Popup";
+import TableTemplate from "../function/DataTable";
+import QuickActionDial from "../function/QuickActionDial";
 import { useAuth } from "@/api/useAuth";
 
-const TeacherClassDetails = () => {
+const ShowParents: React.FC = () => {
   const navigate = useNavigate();
   const {
     currentUser,
-    getClassStudents,
-    sclassStudents,
+    getAllStudents,
+    studentsList,
     loading,
     error,
     getresponse,
+    deleteUser,
   } = useAuth();
 
-  const classID = currentUser?.user?.teachSclassId;
-  const subjectID = currentUser?.user?.teachSubjectId;
-
+  const ID = currentUser?.user?.id;
   useEffect(() => {
-    getClassStudents(classID, "class");
-  }, [classID]);
+    if (currentUser && ID) {
+      getAllStudents(ID);
+      // getUserDetails(, "student");
+    }
+  }, [ID]);
 
-  // if (error) {
-  //   console.log(error);
-  // }
+  const [showPopup, setShowPopup] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const deleteHandler = (deleteID: string, address: string) => {
+    console.log(deleteID);
+    console.log(address);
+    // setMessage("Sorry, the delete function has been disabled for now.");
+    // setShowPopup(true);
+
+    deleteUser(deleteID, address).then(() => {
+      getAllStudents(currentUser?.user?.id);
+    });
+  };
 
   const studentColumns = [
     { id: "name", label: "Name", minWidth: 170 },
     { id: "rollNum", label: "Roll Number", minWidth: 100 },
+    { id: "sclassName", label: "Class", minWidth: 170 },
   ];
 
-  const studentRows = sclassStudents.map((student) => ({
-    name: student.name,
-    rollNum: student.rollNum,
-    id: student.id,
-  }));
+  const studentRows =
+    studentsList && studentsList.length > 0
+      ? studentsList.map((student) => ({
+          name: student.name,
+          rollNum: student.rollNum,
+          sclassName: student.sclass.sclassName,
+          id: student.id,
+        }))
+      : [];
 
   interface StudentButtonHaverProps {
     row: {
       id: string;
     };
   }
-  const StudentsButtonHaver: React.FC<StudentButtonHaverProps> = ({ row }) => {
+
+  const StudentButtonHaver: React.FC<StudentButtonHaverProps> = ({ row }) => {
     const options = ["Take Attendance", "Provide Marks"];
+
     const [open, setOpen] = useState(false);
-    const anchorRef = useRef<HTMLButtonElement | null>(null);
+    const anchorRef = useRef<HTMLDivElement | null>(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const handleClick = () => {
@@ -65,11 +86,11 @@ const TeacherClassDetails = () => {
     };
 
     const handleAttendance = () => {
-      navigate(`/teacher/class/student/attendance/${row.id}/${subjectID}`);
+      navigate("/admin/students/student/attendance/" + row.id);
     };
 
     const handleMarks = () => {
-      navigate(`/teacher/class/student/marks/${row.id}/${subjectID}`);
+      navigate("/admin/students/student/marks/" + row.id);
     };
 
     const handleMenuItemClick = (index: number) => {
@@ -81,7 +102,7 @@ const TeacherClassDetails = () => {
       setOpen((prevOpen) => !prevOpen);
     };
 
-    const handleClose = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handleClose = (event: MouseEvent<Document>) => {
       if (
         anchorRef.current &&
         anchorRef.current.contains(event.target as Node)
@@ -94,12 +115,18 @@ const TeacherClassDetails = () => {
     return (
       <div className="flex items-center space-x-2 justify-center">
         <button
-          onClick={() => navigate(`/teacher/class/student/${row.id}`)}
+          onClick={() => deleteHandler(row.id, "student")}
+          className="text-red-600 hover:text-red-800"
+        >
+          <XCircle className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => navigate("/admin/students/student/" + row.id)}
           className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600"
         >
           <EyeIcon />
         </button>
-        <div className="relative">
+        <div className="relative" ref={anchorRef}>
           <div className="flex">
             <button
               onClick={handleClick}
@@ -119,10 +146,7 @@ const TeacherClassDetails = () => {
             </button>
           </div>
           {open && (
-            <div
-              className="absolute z-10 mt-2 bg-white border rounded shadow-lg"
-              onClick={handleClose}
-            >
+            <div className="absolute z-10 mt-2 bg-white border rounded shadow-lg">
               {options.map((option, index) => (
                 <button
                   key={option}
@@ -141,8 +165,21 @@ const TeacherClassDetails = () => {
     );
   };
 
+  const actions = [
+    {
+      icon: <PlusCircle className="text-blue-600" />,
+      name: "Add New Student",
+      action: () => navigate("/admin/add-students"),
+    },
+    {
+      icon: <XCircle className="text-red-600" />,
+      name: "Delete All Students",
+      action: () => deleteHandler(ID, "student"),
+    },
+  ];
+
   return (
-    <div className="p-4">
+    <>
       {loading ? (
         <>
           <ArrowLeft
@@ -156,26 +193,42 @@ const TeacherClassDetails = () => {
           </div>
         </>
       ) : (
-        <div>
-          <h1 className="text-3xl font-bold text-center mb-4">Class Details</h1>
+        <>
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+
           {getresponse ? (
-            <div className="text-center mt-4">No Students Found</div>
+            <div className="flex justify-end mt-4">
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                onClick={() => navigate("/admin/add-students")}
+              >
+                Add Students
+              </button>
+            </div>
           ) : (
-            <div className="overflow-x-auto">
-              <h2 className="text-2xl font-semibold mb-2">Students List:</h2>
-              {Array.isArray(sclassStudents) && sclassStudents.length > 0 && (
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              {Array.isArray(studentsList) && studentsList.length > 0 && (
                 <TableTemplate
-                  buttonHaver={StudentsButtonHaver}
+                  buttonHaver={StudentButtonHaver}
                   columns={studentColumns}
                   rows={studentRows}
                 />
               )}
+              <QuickActionDial actions={actions} />
             </div>
           )}
-        </div>
+        </>
       )}
-    </div>
+      <Popup
+        message={message}
+        setShowPopup={setShowPopup}
+        showPopup={showPopup}
+      />
+    </>
   );
 };
 
-export default TeacherClassDetails;
+export default ShowParents;

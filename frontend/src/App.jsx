@@ -35,6 +35,7 @@ import Logout from "./components/Logout";
 import StudentComplain from "./components/student/StudentComplain";
 import ViewStudentAttendance from "./components/student/ViewStudentAttendance";
 import StudentSubjects from "./components/student/StudentSubjects";
+import ShowParents from "./components/admin/ShowParents";
 const App = () => {
   return (
     <BrowserRouter>
@@ -176,6 +177,14 @@ const App = () => {
             element={
               <ProtectedRoute roles={["Admin"]}>
                 <ViewStudent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/parents"
+            element={
+              <ProtectedRoute roles={["Admin"]}>
+                <ShowParents />
               </ProtectedRoute>
             }
           />

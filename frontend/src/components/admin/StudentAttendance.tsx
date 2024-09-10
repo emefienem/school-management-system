@@ -24,7 +24,7 @@ const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
     updateStudentFields,
     getresponse,
     error,
-    status,
+    getstatus,
     loading,
   } = useAuth();
 
@@ -37,7 +37,7 @@ const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
   const [studentID, setStudentID] = useState<string>("");
   const [subjectName, setSubjectName] = useState<string>("");
   const [chosenSubName, setChosenSubName] = useState<string>("");
-  const [stat, setStat] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
   const [date, setDate] = useState<string>("");
 
   const [showPopup, setShowPopup] = useState<boolean>(false);
@@ -53,6 +53,7 @@ const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
       setStudentID(studentID!);
       getUserDetails(studentID!, "student");
       setChosenSubName(subjectID!);
+      console.log(subjectID || "None");
     }
   }, [situation]);
 
@@ -62,7 +63,7 @@ const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
       userDetails?.sclass?.sclassName &&
       situation === "Student"
     ) {
-      getSubjectList(userDetails.sclassId, "subject");
+      getSubjectList(userDetails.schoolId, "subject");
     }
   }, [userDetails]);
 
@@ -72,12 +73,21 @@ const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
     );
     setSubjectName(selectedSubject.subName);
     setChosenSubName(selectedSubject.id);
+    console.log(selectedSubject.id);
   };
 
-  const fields = { subName: chosenSubName, stat, date };
+  // const fields = { subNameId: chosenSubName, status: status, date };
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault();
+
+    const fields = { subNameId: chosenSubName, status, date };
+
+    if (!status || !chosenSubName || !date) {
+      alert("Please fill in all fields");
+      return;
+    }
+
     setLoader(true);
     updateStudentFields(studentID, fields, "student");
   };
@@ -91,123 +101,123 @@ const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
       setLoader(false);
       setShowPopup(true);
       setMessage("Error occurred");
-    } else if (status === "added") {
+    } else if (getstatus === "added") {
       setLoader(false);
       setShowPopup(true);
       setMessage("Done Successfully");
     }
-  }, [getresponse, status, error]);
+  }, [getresponse, getstatus, error]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      {loading ? (
-        <>
-          <ArrowLeft
-            onClick={() => navigate(-1)}
-            className="bg-blue-500 text-white mb-8"
-          />
+    <>
+      <ArrowLeft
+        onClick={() => navigate(-1)}
+        className="bg-blue-500 text-white mb-8"
+      />
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        {loading ? (
           <div className="text-center flex justify-center items-center py-4">
             <div className="flex justify-center items-center h-screen">
               <Loader className="animate-spin w-12 h-12 text-purple-600" />
             </div>
           </div>
-        </>
-      ) : (
-        <div className="w-full max-w-lg bg-white p-8 shadow-md rounded-lg">
-          <div className="mb-6">
-            <h4 className="text-xl font-semibold">
-              Student Name: {userDetails.name}
-            </h4>
-            {currentUser?.teachSubject && (
-              <h4 className="text-xl font-semibold mt-2">
-                Subject Name: {currentUser?.teachSubject?.subName}
+        ) : (
+          <div className="w-full max-w-lg bg-white p-8 shadow-md rounded-lg">
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold">
+                Student Name: {userDetails.name}
               </h4>
-            )}
-          </div>
-          <form onSubmit={submitHandler}>
-            {situation === "Student" && (
+              {currentUser?.teachSubject && (
+                <h4 className="text-xl font-semibold mt-2">
+                  Subject Name: {currentUser?.teachSubject?.subName}
+                </h4>
+              )}
+            </div>
+            <form onSubmit={submitHandler}>
+              {situation === "Student" && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Select Subject
+                  </label>
+                  <select
+                    value={subjectName}
+                    onChange={changeHandler}
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    {subjectsList?.map((subject: any, index: number) => (
+                      <option key={index} value={subject.subName}>
+                        {subject.subName}
+                      </option>
+                    )) || (
+                      <option value="Select Subject">
+                        Add Subjects For Attendance
+                      </option>
+                    )}
+                  </select>
+                </div>
+              )}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700">
-                  Select Subject
+                  Attendance status
                 </label>
                 <select
-                  value={subjectName}
-                  onChange={changeHandler}
+                  value={status}
+                  onChange={(event) => setStatus(event.target.value)}
                   required
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >
-                  {subjectsList?.map((subject: any, index: number) => (
-                    <option key={index} value={subject.subName}>
-                      {subject.subName}
-                    </option>
-                  )) || (
-                    <option value="Select Subject">
-                      Add Subjects For Attendance
-                    </option>
-                  )}
+                  <option value="Present">Present</option>
+                  <option value="Absent">Absent</option>
                 </select>
               </div>
-            )}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Attendance stat
-              </label>
-              <select
-                value={stat}
-                onChange={(event) => setStat(event.target.value)}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Date
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(event) => setDate(event.target.value)}
+                  required
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loader}
+                className={`w-full py-2 px-4 text-white rounded-md shadow-md ${
+                  loader
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-purple-600 hover:bg-purple-700"
+                }`}
               >
-                <option value="Present">Present</option>
-                <option value="Absent">Absent</option>
-              </select>
-            </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Date
-              </label>
-              <input
-                type="date"
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loader}
-              className={`w-full py-2 px-4 text-white rounded-md shadow-md ${
-                loader
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-purple-600 hover:bg-purple-700"
-              }`}
-            >
-              {loader ? (
-                <LucideLoader className="animate-spin" size={24} />
-              ) : (
-                "Submit"
-              )}
-            </button>
-          </form>
-          {showPopup && (
-            <div className="fixed inset-0 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-medium">{message}</h4>
-                  <button
-                    className="text-gray-500 hover:text-gray-700"
-                    onClick={() => setShowPopup(false)}
-                  >
-                    <LucideCheckCircle size={24} />
-                  </button>
+                {loader ? (
+                  <LucideLoader className="animate-spin" size={24} />
+                ) : (
+                  "Submit"
+                )}
+              </button>
+            </form>
+            {showPopup && (
+              <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-medium">{message}</h4>
+                    <button
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => setShowPopup(false)}
+                    >
+                      <LucideCheckCircle size={24} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

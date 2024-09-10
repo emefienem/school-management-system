@@ -160,7 +160,21 @@ const studentCtrl = {
           school: { select: { schoolName: true } },
           sclass: { select: { sclassName: true } },
           examResults: { include: { subName: { select: { subName: true } } } },
-          attendance: { include: { subName: { select: { subName: true } } } },
+          // attendance: {
+          //   include: { subName: { select: { subName: true } } },
+          //   select: { sessions: true },
+          // },
+          attendance: {
+            select: {
+              subName: { select: { subName: true } },
+              subNameId: true,
+              sessions: true,
+              status: true,
+              date: true,
+              presentCount: true,
+              absentCount: true,
+            },
+          },
           parent: true,
           fees: true,
         },
@@ -306,7 +320,7 @@ const studentCtrl = {
   studentAttendance: async (req, res) => {
     try {
       const { id } = req.params;
-      const { subName, status, date } = req.body;
+      const { subNameId, status, date } = req.body;
       const student = await prisma.student.findUnique({
         where: { id: Number(id) },
         include: { attendance: true },
@@ -317,13 +331,17 @@ const studentCtrl = {
       }
 
       const subject = await prisma.subject.findUnique({
-        where: { id: Number(subName) },
+        where: { id: Number(subNameId) },
       });
+
+      if (!subject) {
+        return res.status(404).send({ message: "Subject not found" });
+      }
 
       const existingAttendance = student.attendance.find(
         (a) =>
           new Date(a.date).toDateString() === new Date(date).toDateString() &&
-          a.subNameId === Number(subName)
+          a.subNameId === Number(subNameId)
       );
 
       if (existingAttendance) {
@@ -333,20 +351,25 @@ const studentCtrl = {
         });
       } else {
         const attendedSessions = student.attendance.filter(
-          (a) => a.subNameId === Number(subName)
+          (a) => a.subNameId === Number(subNameId)
         ).length;
 
         if (attendedSessions >= subject.sessions) {
           return res.send({ message: "Maximum attendance limit reached" });
         }
 
+        if (!status) {
+          return res.status(400).send({ message: "Status is required" });
+        }
+
         await prisma.attendance.create({
           data: {
             date: new Date(date),
-            status,
-            subNameId: Number(subName),
+            status: String(status),
+            subNameId: Number(subNameId),
             studentId: student.id,
-            teacherId: existingAttendance.teacherId, // Assuming teacherId is stored
+            teacherId: subject.teacherId || null,
+            sessions: attendedSessions + 1,
           },
         });
       }
@@ -358,7 +381,7 @@ const studentCtrl = {
 
       res.send(updatedStudent);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 
@@ -403,8 +426,13 @@ const studentCtrl = {
 
   removeStudentAttendanceBySubject: async (req, res) => {
     try {
+      console.log("Request body:", req.body);
       const studentId = Number(req.params.id);
       const subNameId = Number(req.body.subId);
+
+      if (isNaN(subNameId)) {
+        return res.status(400).json({ message: "Invalid subId" });
+      }
       await prisma.attendance.deleteMany({
         where: {
           studentId,
@@ -414,7 +442,7 @@ const studentCtrl = {
 
       res.send({ message: "Attendance removed for the subject" });
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 

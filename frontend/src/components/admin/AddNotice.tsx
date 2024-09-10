@@ -7,8 +7,14 @@ import { toast } from "sonner";
 
 const AddNotice: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, status, getresponse, error, addStuff, resetAuthStatus } =
-    useAuth();
+  const {
+    currentUser,
+    getstatus,
+    getresponse,
+    error,
+    addStuff,
+    resetAuthStatus,
+  } = useAuth();
 
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
@@ -36,16 +42,16 @@ const AddNotice: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "added") {
+    if (getstatus === "added") {
       navigate("/admin/notices");
       resetAuthStatus();
-    } else if (status === "error") {
+    } else if (getstatus === "error") {
       setMessage("Network Error");
       setShowPopup(true);
       setLoader(false);
       console.log(error);
     }
-  }, [status, navigate, error, getresponse]);
+  }, [getstatus, navigate, error, getresponse]);
 
   return (
     <>

@@ -13,7 +13,7 @@ const AddStudent: React.FC<AddStudentProps> = ({ situation }) => {
   const params = useParams<{ id: string }>();
 
   const {
-    status,
+    getstatus,
     currentUser,
     getresponse,
     sclasses,
@@ -84,23 +84,23 @@ const AddStudent: React.FC<AddStudentProps> = ({ situation }) => {
   };
 
   useEffect(() => {
-    if (status === "added") {
+    if (getstatus === "added") {
       resetAuthStatus();
       navigate(-1);
-    } else if (status === "failed") {
+    } else if (getstatus === "failed") {
       setMessage(getresponse ?? "An error occurred");
       setShowPopup(true);
       setLoader(false);
-    } else if (status === "error") {
+    } else if (getstatus === "error") {
       setMessage("Network Error");
       setShowPopup(true);
       setLoader(false);
     }
-  }, [status, navigate, getresponse]);
+  }, [getstatus, navigate, getresponse]);
 
   const handleRollNumChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
-    setRollNum(isNaN(value) ? undefined : value); // Set undefined if the input is not a valid number
+    setRollNum(isNaN(value) ? undefined : value);
   };
 
   return (

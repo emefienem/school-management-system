@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import TableTemplate from "../function/DataTable";
 import { ArrowLeft, CheckSquare, Loader, Square } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
-import SLG from "../../assets/slg.png";
 import { useNavigate } from "react-router";
 
 const SeeComplains: React.FC = () => {
@@ -50,7 +49,9 @@ const SeeComplains: React.FC = () => {
             ? date.toISOString().substring(0, 10)
             : "Invalid Date";
         return {
-          user: complain.user.name,
+          user: complain?.teacher?.name
+            ? complain?.teacher?.name
+            : complain?.student?.name,
           complaint: complain.complaint,
           date: dateString,
           id: complain.id,

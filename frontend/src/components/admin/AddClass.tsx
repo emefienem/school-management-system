@@ -16,7 +16,7 @@ const AddClass: React.FC = () => {
 
   const navigate = useNavigate();
   const {
-    status,
+    getstatus,
     currentUser,
     getresponse,
     error,
@@ -47,7 +47,7 @@ const AddClass: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "added" && details) {
+    if (getstatus === "added" && details) {
       toast.success("Added the class");
       if (Array.isArray(details)) {
         if (details.length > 0 && details[0]?.id) {
@@ -61,16 +61,16 @@ const AddClass: React.FC = () => {
       }
       resetAuthStatus();
       setLoader(false);
-    } else if (status === "failed") {
+    } else if (getstatus === "failed") {
       setMessage(getresponse ?? "An error occurred");
       setShowPopup(true);
       setLoader(false);
-    } else if (status === "error") {
+    } else if (getstatus === "error") {
       setMessage("Network Error");
       setShowPopup(true);
       setLoader(false);
     }
-  }, [status, navigate, error, getresponse, details, resetAuthStatus]);
+  }, [getstatus, navigate, error, getresponse, details, resetAuthStatus]);
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">

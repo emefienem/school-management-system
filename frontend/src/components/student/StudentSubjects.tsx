@@ -19,11 +19,13 @@ const StudentSubjects: React.FC = () => {
     error,
   } = useAuth();
   const classID = currentUser?.user?.sclassId;
+  const subjectID = currentUser?.user?.schoolId;
+
   const ID = currentUser?.user?.id;
   useEffect(() => {
     getClassDetails(classID, "class");
     getUserDetails(ID, "student");
-    getSubjectList(ID, "subject");
+    getSubjectList(subjectID, "subject");
   }, [ID]);
 
   if (getresponse) {
@@ -87,9 +89,9 @@ const StudentSubjects: React.FC = () => {
     <div className="container mx-auto">
       <h2 className="text-2xl font-semibold text-center my-4">Class Details</h2>
       <h3 className="text-xl font-medium mb-4">
-        You are currently in Class {sclassDetails && sclassDetails.sclassName}
+        You are currently in class: {sclassDetails && sclassDetails.sclassName}
       </h3>
-      <h4 className="text-lg font-medium mb-2">And these are the subjects:</h4>
+      <h4 className="text-lg font-medium mb-2">The subjects:</h4>
       {subjectsList &&
         subjectsList.map((subject, index) => (
           <p key={index} className="text-base">

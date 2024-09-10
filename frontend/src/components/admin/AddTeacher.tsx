@@ -16,7 +16,7 @@ const AddTeacher: React.FC = () => {
     register,
     getSubjectDetails,
     subjectDetails,
-    status,
+    getstatus,
     getresponse,
     error,
     resetAuthStatus,
@@ -60,19 +60,19 @@ const AddTeacher: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "added") {
+    if (getstatus === "added") {
       resetAuthStatus();
       navigate("/admin/teachers");
-    } else if (status === "failed") {
+    } else if (getstatus === "failed") {
       setMessage(getresponse as string);
       setShowPopup(true);
       setLoader(false);
-    } else if (status === "error") {
+    } else if (getstatus === "error") {
       setMessage("Network Error");
       setShowPopup(true);
       setLoader(false);
     }
-  }, [status, navigate, error, getresponse]);
+  }, [getstatus, navigate, error, getresponse]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

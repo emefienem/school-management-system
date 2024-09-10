@@ -12,8 +12,8 @@ interface Subject {
   sclass: {
     sclassName: string;
     schoolId: string;
-    id: string;
   };
+  id: string;
   // sclassName: string;
 }
 
@@ -41,12 +41,6 @@ const ShowSubjects: React.FC = () => {
     } else console.log("ID undefined");
   }, [ID, getSubjectList, getAllSclasses]);
 
-  // if (error) {
-  //   return (
-  //     <div className="text-center text-red-500">An error occurred: {error}</div>
-  //   );
-  // }
-
   const deleteHandler = async (deleteID: string, address: string) => {
     console.log(deleteID);
     console.log(address);
@@ -68,8 +62,8 @@ const ShowSubjects: React.FC = () => {
         subName: subject.subName,
         sessions: subject.sessions,
         sclassName: subject.sclass.sclassName,
-        sclassId: subject.sclass.schoolId,
-        id: subject.sclass.id,
+        sclassId: subject.id,
+        id: subject.id,
       }))
     : [];
 

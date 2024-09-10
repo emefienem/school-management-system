@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TableTemplate from "../function/DataTable";
 import { useAuth } from "@/api/useAuth";
-import SLG from "../../assets/slg.png";
 import { Loader } from "lucide-react";
 
 interface ChooseClassProps {
@@ -49,13 +48,6 @@ const ChooseClass: React.FC<ChooseClassProps> = ({ situation }) => {
       </div>
     );
   }
-
-  // if (error) {
-  //   console.log(error);
-  //   return (
-  //     <div className="text-center text-red-500">Error loading classes.</div>
-  //   );
-  // }
 
   return (
     <>

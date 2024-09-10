@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, MouseEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import { deleteUser } from "../../../redux/userRelated/userHandle";
 import {
   XCircle,
   PlusCircle,
@@ -14,7 +13,6 @@ import Popup from "../function/Popup";
 import TableTemplate from "../function/DataTable";
 import QuickActionDial from "../function/QuickActionDial";
 import { useAuth } from "@/api/useAuth";
-import SLG from "../../assets/slg.png";
 
 const ShowStudents: React.FC = () => {
   const params = useParams<{ id: string }>();
@@ -25,7 +23,6 @@ const ShowStudents: React.FC = () => {
   const {
     currentUser,
     getAllStudents,
-    getUserDetails,
     studentsList,
     loading,
     error,
@@ -37,7 +34,6 @@ const ShowStudents: React.FC = () => {
   useEffect(() => {
     if (currentUser && ID) {
       getAllStudents(ID);
-      // getUserDetails(, "student");
     }
   }, [ID]);
 

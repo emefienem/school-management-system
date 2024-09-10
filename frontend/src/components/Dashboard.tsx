@@ -20,8 +20,6 @@ import { useNavigate, useParams } from "react-router";
 import PieCharts from "./function/PieChart";
 
 const Dashboard = () => {
-  const params = useParams<{ id: string }>();
-
   const {
     currentUser,
     currentRole,
@@ -42,7 +40,6 @@ const Dashboard = () => {
     loading,
     getresponse,
   } = useAuth();
-  const studentID = params.id!;
 
   const ID =
     currentRole === "Admin"
@@ -52,14 +49,14 @@ const Dashboard = () => {
   const teachSubjectID = currentUser?.user?.teachSubjectId;
 
   const [subjectAttendance, setSubjectAttendance] = useState<any[]>([]);
-  const classID = currentUser?.user?.sclassId;
+  const classID = currentUser?.user?.schoolId;
   // const classID = currentUser?.user?.id;
   useEffect(() => {
-    // if (currentRole === "teacher") {
-    if (teachSubjectID) getSubjectDetails(teachSubjectID, "subject");
-    if (teachSclassID) getClassStudents(teachSclassID, "class");
-    console.log(teachSclassID, teachSubjectID);
-    // }
+    if (currentRole === "teacher") {
+      if (teachSubjectID) getSubjectDetails(teachSubjectID, "subject");
+      if (teachSclassID) getClassStudents(teachSclassID, "class");
+      console.log(teachSclassID, teachSubjectID);
+    }
   }, [teachSubjectID, teachSclassID]);
 
   useEffect(() => {
@@ -73,14 +70,14 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (currentRole === "Student") {
-      getUserDetails(currentUser.user.id, "student");
+      getUserDetails(currentUser?.user?.id, "student");
       getSubjectList(classID, "subject");
     }
-  }, [currentUser.user.id]);
+  }, [currentUser?.user?.id, classID]);
 
   useEffect(() => {
     if (userDetails) {
-      setSubjectAttendance(userDetails.attendance || []);
+      setSubjectAttendance(userDetails?.attendance || []);
     }
   }, [userDetails]);
 

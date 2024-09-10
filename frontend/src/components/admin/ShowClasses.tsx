@@ -14,7 +14,6 @@ import {
 import QuickActionDial from "../function/QuickActionDial";
 import TableTemplate from "../function/DataTable";
 import Popup from "../function/Popup";
-import SLG from "../../assets/slg.png";
 
 const ShowClasses = () => {
   const navigate = useNavigate();
