@@ -50,7 +50,6 @@ const SeeNotice: React.FC = () => {
       {loading ? (
         <div className="text-xl flex justify-center items-center">
           <Loader className="animate-spin" />
-          <span className="ml-2">Loading...</span>
         </div>
       ) : (
         <>

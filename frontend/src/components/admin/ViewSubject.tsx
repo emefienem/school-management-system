@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TableTemplate from "../function/DataTable";
-import { Car, BarChart, Loader, ArrowLeft, EyeIcon } from "lucide-react";
+import { BookA, BarChart, Loader, ArrowLeft, EyeIcon } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
 
 const ViewSubject: React.FC = () => {
@@ -27,7 +27,6 @@ const ViewSubject: React.FC = () => {
       getSubjectDetails(subjectID!, "subject");
       getClassStudents(classID!, "class");
       console.log(classID);
-      console.log(getresponse);
     }
   }, [subjectID, classID]);
 
@@ -46,11 +45,41 @@ const ViewSubject: React.FC = () => {
     { id: "name", label: "Name", minWidth: 170 },
   ];
 
-  const studentRows = sclassStudents.map((student) => ({
+  const targetSclassId = subjectDetails?.sclassId;
+
+  const filteredStudents = Array.isArray(sclassStudents)
+    ? sclassStudents.map((student) => {
+        let count = 0;
+
+        const matchesStudentClass = student.sclassId === targetSclassId;
+        if (matchesStudentClass) {
+          count += 1;
+        }
+
+        const matchesEnrolledSubject =
+          Array.isArray(student.enrollment) &&
+          student.enrollment.some(
+            (enrollment: { subject: any; sclassId: string }) =>
+              enrollment.subject &&
+              enrollment.subject.sclassId === targetSclassId
+          );
+        if (matchesEnrolledSubject) {
+          count += 1;
+        }
+
+        return { ...student, count };
+      })
+    : [];
+
+  const studentRows = filteredStudents.map((student) => ({
     rollNum: student.rollNum,
     name: student.name,
     id: student.id,
   }));
+
+  useEffect(() => {
+    console.log(getresponse);
+  });
 
   const StudentsAttendanceButtonHaver: React.FC<{ row: { id: string } }> = ({
     row,
@@ -87,7 +116,7 @@ const ViewSubject: React.FC = () => {
 
   const SubjectStudentsSection: React.FC = () => (
     <div>
-      {getresponse ? (
+      {filteredStudents.length === 0 ? (
         <div className="flex justify-end mt-4">
           <button
             onClick={() => navigate(`/admin/class/add-students/${classID}`)}
@@ -122,7 +151,7 @@ const ViewSubject: React.FC = () => {
                 }`}
                 onClick={() => handleSectionChange("attendance")}
               >
-                <Car className="mx-auto" />
+                <BookA className="mx-auto" />
                 <span>Attendance</span>
               </button>
               <button
@@ -142,58 +171,115 @@ const ViewSubject: React.FC = () => {
   );
 
   const SubjectDetailsSection: React.FC = () => {
-    const numberOfStudents = sclassStudents.length;
+    const targetSclassId = subjectDetails?.sclassId;
+
+    const filteredStudents = Array.isArray(sclassStudents)
+      ? sclassStudents.map((student) => {
+          let count = 0;
+
+          if (student.sclassId === targetSclassId) {
+            count += 1;
+          }
+
+          if (
+            Array.isArray(student.enrollment) &&
+            student.enrollment.some(
+              (enrollment: { subject: any; sclassId: string }) =>
+                enrollment.subject.sclassId === targetSclassId
+            )
+          ) {
+            count += 1;
+          }
+
+          return { ...student, count };
+        })
+      : [];
+
+    const numberOfStudents = filteredStudents.reduce(
+      (total, student) => total + student.count,
+      0
+    );
 
     return (
-      <div className="text-center space-y-12">
+      <div className="overflow-x-auto">
         <h4 className="text-2xl font-bold mb-4 text-blue-500 text-start">
           Subject Details
         </h4>
-        <p className="text-lg mb-2 font-bold">
-          Subject Name:{" "}
-          <span className="text-blue-500">
-            {subjectDetails?.subName || "N/A"}
-          </span>
-        </p>
-        <p className="text-lg mb-2 uppercase font-bold">
-          Subject Code:{" "}
-          <span className="text-blue-500">
-            {subjectDetails?.subCode || "N/A"}
-          </span>
-        </p>
-        <p className="text-lg mb-2 uppercase font-bold">
-          Subject Sessions:{" "}
-          <span className="text-blue-500">
-            {subjectDetails?.sessions || "N/A"}
-          </span>
-        </p>
-        <p className="text-lg mb-2 uppercase font-bold">
-          Number of Students:{" "}
-          <span className="text-blue-500">{numberOfStudents}</span>{" "}
-        </p>
-        <p className="text-lg mb-2  font-bold">
-          Class Name:{" "}
-          <span className="text-blue-500">
-            {subjectDetails?.sclass?.sclassName || "N/A"}
-          </span>
-        </p>
-        {subjectDetails?.teacher ? (
-          <p className="text-lg mb-2 uppercase font-bold">
-            Teacher Name:{" "}
-            <span className="text-orange-500">
-              {subjectDetails.teacher.name}
-            </span>
-          </p>
-        ) : (
-          <button
-            onClick={() =>
-              navigate(`/admin/teachers/addteacher/${subjectDetails?.id}`)
-            }
-            className="bg-green-500 text-white px-4 py-2 rounded-xl"
-          >
-            Add Subject Teacher
-          </button>
-        )}
+        <table className="min-w-full border border-gray-300">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="py-2 px-4 border-b text-left text-gray-600 font-bold">
+                Attribute
+              </th>
+              <th className="py-2 px-4 border-b text-left text-gray-600 font-bold">
+                Details
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                Subject Name
+              </td>
+              <td className="py-2 px-4 border-b text-blue-500">
+                {subjectDetails?.subName || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                Subject Code
+              </td>
+              <td className="py-2 px-4 border-b text-blue-500">
+                {subjectDetails?.subCode || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                Subject Sessions
+              </td>
+              <td className="py-2 px-4 border-b text-blue-500">
+                {subjectDetails?.sessions || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                Number of Students
+              </td>
+              <td className="py-2 px-4 border-b text-blue-500">
+                {numberOfStudents}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                Class Name
+              </td>
+              <td className="py-2 px-4 border-b text-blue-500">
+                {subjectDetails?.sclass?.sclassName || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                Teacher Name
+              </td>
+              <td className="py-2 px-4 border-b text-orange-500">
+                {subjectDetails?.teacher ? (
+                  subjectDetails.teacher.name
+                ) : (
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/admin/teachers/addteacher/${subjectDetails?.id}`
+                      )
+                    }
+                    className="bg-green-500 text-white px-4 py-2 rounded-xl"
+                  >
+                    Add Subject Teacher
+                  </button>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     );
   };

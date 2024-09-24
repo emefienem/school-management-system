@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "../function/Popup";
 import { useAuth } from "@/api/useAuth";
-import { Loader } from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 import { toast } from "sonner";
 
 const AddNotice: React.FC = () => {
@@ -55,6 +55,10 @@ const AddNotice: React.FC = () => {
 
   return (
     <>
+      <ArrowLeft
+        onClick={() => navigate(-1)}
+        className="bg-blue-500 text-white mb-8"
+      />
       <div className="flex justify-center items-center h-screen">
         <form
           className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"

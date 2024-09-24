@@ -39,6 +39,8 @@ const Dashboard = () => {
     getSubjectList,
     loading,
     getresponse,
+    getEnrolledSubjects,
+    enrolledSubjects,
   } = useAuth();
 
   const ID =
@@ -50,7 +52,6 @@ const Dashboard = () => {
 
   const [subjectAttendance, setSubjectAttendance] = useState<any[]>([]);
   const classID = currentUser?.user?.schoolId;
-  // const classID = currentUser?.user?.id;
   useEffect(() => {
     if (currentRole === "teacher") {
       if (teachSubjectID) getSubjectDetails(teachSubjectID, "subject");
@@ -64,7 +65,6 @@ const Dashboard = () => {
       getAllStudents(ID);
       getAllSclasses(ID, "class");
       getAllTeachers(ID);
-      // getSubjectList(ID, "subject");
     }
   }, [ID]);
 
@@ -72,6 +72,7 @@ const Dashboard = () => {
     if (currentRole === "Student") {
       getUserDetails(currentUser?.user?.id, "student");
       getSubjectList(classID, "subject");
+      getEnrolledSubjects(currentUser?.user?.id);
     }
   }, [currentUser?.user?.id, classID]);
 
@@ -89,8 +90,14 @@ const Dashboard = () => {
   const numberOfStudents = sclassStudents?.length || 0;
   const numberOfSessions = subjectDetails?.sessions || 0;
   // Student
-  const numberOfSubjects = subjectsList && subjectsList.length;
+  const filteredSubjects = subjectsList.filter(
+    (subject) => subject?.sclassId === userDetails?.sclassId
+  );
 
+  const numberOfSubject =
+    filteredSubjects.length > 0 ? filteredSubjects.length : 0;
+
+  const numberOfSubjects = numberOfSubject + enrolledSubjects.length;
   const overallAttendancePercentage =
     calculateOverallAttendancePercentage(subjectAttendance);
   const overallAbsentPercentage = 100 - overallAttendancePercentage;

@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_BASE_URL;
+// import { useQueryClient } from "@tanstack/react-query";
+
 interface AuthState {
   status: string;
   userDetails: { [key: string]: any };
@@ -14,6 +16,7 @@ interface AuthState {
   darkMode: boolean;
   accessToken: string;
   refreshToken: string;
+  feeData: any;
   teacherDetails: any;
   subjectDetails: any;
   sclassDetails: any;
@@ -21,9 +24,13 @@ interface AuthState {
   subjectsList: any[];
   sclasses: any[];
   teachersList: any[];
+  parentsList: any[];
   studentsList: any[];
   complainList: any[];
   noticeList: any[];
+  fee: any[];
+  availableSubjects: any[];
+  enrolledSubjects: any[];
   authRequest: () => void;
   authSuccess: (user: any) => void;
   authFailed: (error: string) => void;
@@ -50,7 +57,13 @@ interface AuthState {
     teachSubject: string
   ) => Promise<void>;
   getAllStudents: (id: string) => Promise<void>;
+  getAllParents: (id: string) => Promise<void>;
   updateStudentFields: (
+    id: string,
+    fields: any,
+    address: string
+  ) => Promise<void>;
+  updateExamResults: (
     id: string,
     fields: any,
     address: string
@@ -65,6 +78,24 @@ interface AuthState {
   resetAuthStatus: () => void;
   getAllComplains: (id: string, address: string) => Promise<void>;
   getAllNotices: (id: string) => Promise<void>;
+  enrollSubject: (studentId: string, subjectId: string) => Promise<void>;
+  dropSubject: (studentId: string, subjectId: string) => Promise<void>;
+  getAvailableSubjects: (studentId: string) => Promise<void>;
+  getEnrolledSubjects: (studentId: string) => Promise<void>;
+  setFee: (duration: number, amount: number, id: string) => Promise<void>;
+  getFee: (id: string) => Promise<void>;
+  processFee: (
+    rollNum: number,
+    amount: number,
+    paymentType: string
+  ) => Promise<void>;
+  resetPassword: (
+    email: string,
+    code: string,
+    newPassword: string
+  ) => Promise<void>;
+  verifyResetCode: (email: string, code: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -82,6 +113,7 @@ export const useAuthStore = create<AuthState>()(
       darkMode: true,
       accessToken: "",
       refreshToken: "",
+      feeData: null,
       teacherDetails: null,
       subjectDetails: null,
       sclassDetails: null,
@@ -89,9 +121,13 @@ export const useAuthStore = create<AuthState>()(
       subjectsList: [],
       sclasses: [],
       teachersList: [],
+      parentsList: [],
       studentsList: [],
       complainList: [],
       noticeList: [],
+      fee: [],
+      availableSubjects: [],
+      enrolledSubjects: [],
       authRequest: () => set({ status: "loading" }),
       authSuccess: (user) => {
         set({
@@ -180,6 +216,11 @@ export const useAuthStore = create<AuthState>()(
               response:
                 result.data.message || "Teacher registered successfully",
             });
+          } else if (role === "parent" && result.data.id) {
+            set({
+              status: "added",
+              response: result.data.message || "Parent registered successfully",
+            });
           } else if (result.data.school) {
             // Temporary details handling (if needed)
             set({ tempDetails: result.data });
@@ -195,6 +236,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       logout: () => {
+        // const queryClient = useQueryClient()
         set({
           status: "idle",
           currentUser: null,
@@ -202,7 +244,20 @@ export const useAuthStore = create<AuthState>()(
           accessToken: "",
           refreshToken: "",
           noticeList: [],
+          studentsList: [],
+          sclasses: [],
+          teachersList: [],
+          userDetails: [],
+          availableSubjects: [],
+          enrolledSubjects: [],
+          sclassDetails: [],
+          sclassStudents: [],
+          subjectDetails: [],
+          subjectsList: [],
+          teacherDetails: [],
         });
+        // queryClient.clear();
+
         localStorage.removeItem("user");
       },
       getUserDetails: async (id, address) => {
@@ -352,6 +407,22 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      getAllParents: async (id) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(
+            `${apiUrl}/parent/get-all-parents/${id}`
+          );
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({ parentsList: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
       getAllStudents: async (id) => {
         set({ loading: true });
         try {
@@ -385,6 +456,26 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      updateExamResults: async (id, fields, address) => {
+        set({ status: "loading" });
+        try {
+          const result = await axios.put(
+            `${apiUrl}/${address}/update-exam-result/${id}`,
+            fields,
+            {
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+          if (result.data.message) {
+            set({ response: result.data.message, status: "failed" });
+          } else {
+            set({ response: "Update successful", status: "added" });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", status: "error" });
         }
       },
 
@@ -567,6 +658,182 @@ export const useAuthStore = create<AuthState>()(
             error: error.message || "Unknown error",
             loading: false,
           });
+        }
+      },
+
+      enrollSubject: async (studentId, subjectId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/student/enroll`, {
+            studentId,
+            subjectId,
+          });
+
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({
+              response: "Successfully enrolled in the subject.",
+              loading: false,
+            });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      dropSubject: async (studentId, subjectId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/student/drop-subject`, {
+            studentId,
+            subjectId,
+          });
+
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({
+              response: "Successfully dropped the subject.",
+              loading: false,
+            });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getAvailableSubjects: async (studentId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(
+            `${apiUrl}/student/available-subjects`,
+            { studentId }
+          );
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({
+              availableSubjects: result.data,
+              loading: false,
+            });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getEnrolledSubjects: async (studentId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(
+            `${apiUrl}/student/enrolled-subject`,
+            { studentId }
+          );
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({
+              enrolledSubjects: result.data,
+              loading: false,
+            });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      setFee: async (duration, amount, id) => {
+        set({ loading: true });
+        try {
+          await axios.post(`${apiUrl}/fee/set-fee`, {
+            duration,
+            amount,
+            adminID: id,
+          });
+          set({
+            response: "Fee has been set",
+            loading: false,
+          });
+        } catch (error: any) {
+          set({
+            error: error.message || "Unknown error",
+            loading: false,
+          });
+        }
+      },
+
+      getFee: async (id) => {
+        set({ loading: true });
+        try {
+          const response = await axios.get(`${apiUrl}/fee/get-fee/${id}`);
+          set({
+            fee: response.data,
+            loading: false,
+          });
+        } catch (error: any) {
+          set({
+            error: error.message || "Unknown error",
+            loading: false,
+          });
+        }
+      },
+
+      processFee: async (rollNum, amount, paymentType) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/fee/process-fee`, {
+            rollNum,
+            amount,
+            paymentType,
+          });
+          if (result.data) {
+            set({
+              feeData: {
+                paymentIntent: result.data.paymentIntent,
+              },
+              loading: false,
+            });
+          }
+        } catch (error: any) {
+          set({
+            error: error.message || "Unknown error",
+            loading: false,
+          });
+        }
+      },
+
+      resetPassword: async (email, code, newPassword) => {
+        set({ loading: true });
+        try {
+          await axios.post(`${apiUrl}/auth/reset-password`, {
+            email,
+            code,
+            newPassword,
+          });
+          set({ response: "Password reset successfully", loading: false });
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      verifyResetCode: async (email, code) => {
+        set({ loading: true });
+        try {
+          await axios.post(`${apiUrl}/auth/verify-reset-code`, { email, code });
+          set({ response: "Reset code verified successfully", loading: false });
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      forgotPassword: async (email) => {
+        set({ loading: true });
+        try {
+          await axios.post(`${apiUrl}/auth/forgot-password`, { email });
+          set({ response: "Forgot password email sent", loading: false });
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
         }
       },
 

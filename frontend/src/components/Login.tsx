@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/api/useAuth";
 import { Link } from "react-router-dom";
+import * as Select from "@radix-ui/react-select";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export const Login = () => {
   const [fields, setFields] = useState({
@@ -12,6 +14,7 @@ export const Login = () => {
     studentName: "",
   });
   const [role, setRole] = useState("admin");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login, accessToken, getstatus, error } = useAuth();
 
@@ -26,9 +29,7 @@ export const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    toast.loading("Trying to login...");
-    toast.dismiss();
-
+    toast.loading("Trying to login...", { duration: 4000 });
     try {
       await login(fields, role);
       if (role === "student") {
@@ -44,13 +45,13 @@ export const Login = () => {
         await login({ email: fields.email, password: fields.password }, role);
       }
     } catch (error: any) {
-      toast.error(error || "An error occurred.");
+      toast.error(error || "An error occurred.", { duration: 4000 });
     }
   };
 
   useEffect(() => {
     if (getstatus === "success" && accessToken) {
-      toast.success("Logged in successfully!");
+      toast.success("Logged in successfully!", { duration: 2000 });
       navigate("/dashboard");
     } else if (getstatus === "error") {
       toast.error(error);
@@ -115,7 +116,7 @@ export const Login = () => {
               />
             </div>
           )}
-          <div>
+          <div className="relative">
             <label
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
@@ -123,14 +124,25 @@ export const Login = () => {
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={fields.password}
               onChange={handleChange}
               placeholder="Password"
               className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-8 cursor-pointer text-sm text-gray-600 hover:text-gray-900  text-[0.65rem]"
+            >
+              {showPassword ? (
+                <EyeOffIcon className="size-6" />
+              ) : (
+                <EyeIcon className="size-6" />
+              )}
+            </span>
           </div>
+
           <div>
             <label
               htmlFor="role"
@@ -161,6 +173,9 @@ export const Login = () => {
             <Link className="text-blue-500" to={"/sign"}>
               Create Account
             </Link>
+          </div>
+          <div className="text-[0.75rem] text-center">
+            <Link to={"/forgot-password"}>Forgot Password?</Link>
           </div>
         </form>
       </div>

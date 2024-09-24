@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, BarChart, Table, ArrowLeft, Loader } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  BarChart,
+  Table,
+  ArrowLeft,
+  Loader,
+} from "lucide-react";
 import {
   calculateOverallAttendancePercentage,
   calculateSubjectAttendancePercentage,
@@ -89,38 +96,99 @@ const ViewStudentAttendance: React.FC = () => {
                 const subjectAttendancePercentage =
                   calculateSubjectAttendancePercentage(present, sessions);
                 return (
+                  // <React.Fragment key={index}>
+                  //   <tr className="border-t">
+                  //     <td>{subName}</td>
+                  //     <td>{present}</td>
+                  //     <td>{sessions}</td>
+                  //     <td>{subjectAttendancePercentage}%</td>
+                  //     <td className="text-center">
+                  //       <button
+                  //         className="flex items-end justify-end px-4 py-2 bg-blue-500 text-white rounded"
+                  //         onClick={() => handleOpen(subId)}
+                  //       >
+                  //         {openStates[subId] ? (
+                  //           <ChevronUp size={16} />
+                  //         ) : (
+                  //           <ChevronDown size={16} />
+                  //         )}{" "}
+                  //       </button>
+                  //     </td>
+                  //   </tr>
+                  //   {openStates[subId] && (
+                  //     <tr>
+                  //       <td colSpan={5} className="p-4">
+                  //         <div>
+                  //           <h3 className="font-bold mb-2">
+                  //             Attendance Details
+                  //           </h3>
+                  //           <table className="min-w-full table-auto">
+                  //             <thead>
+                  //               <tr>
+                  //                 <th>Date</th>
+                  //                 <th className="text-right">Status</th>
+                  //               </tr>
+                  //             </thead>
+                  //             <tbody>
+                  //               {allData.map(
+                  //                 (data: DataType, index: number) => {
+                  //                   const date = new Date(data.date);
+                  //                   const dateString =
+                  //                     date.toString() !== "Invalid Date"
+                  //                       ? date.toISOString().substring(0, 10)
+                  //                       : "Invalid Date";
+                  //                   return (
+                  //                     <tr key={index}>
+                  //                       <td>{dateString}</td>
+                  //                       <td className="text-right">
+                  //                         {data.status}
+                  //                       </td>
+                  //                     </tr>
+                  //                   );
+                  //                 }
+                  //               )}
+                  //             </tbody>
+                  //           </table>
+                  //         </div>
+                  //       </td>
+                  //     </tr>
+                  //   )}
+                  // </React.Fragment>
                   <React.Fragment key={index}>
-                    <tr className="border-t">
-                      <td>{subName}</td>
-                      <td>{present}</td>
-                      <td>{sessions}</td>
-                      <td>{subjectAttendancePercentage}%</td>
-                      <td className="text-center">
+                    <tr className="border-t hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-2">{subName}</td>
+                      <td className="px-4 py-2">{present}</td>
+                      <td className="px-4 py-2">{sessions}</td>
+                      <td className="px-4 py-2">
+                        {subjectAttendancePercentage}%
+                      </td>
+                      <td className="text-center px-4 py-2 flex justify-center">
                         <button
-                          className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded"
+                          className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                           onClick={() => handleOpen(subId)}
                         >
                           {openStates[subId] ? (
                             <ChevronUp size={16} />
                           ) : (
                             <ChevronDown size={16} />
-                          )}{" "}
-                          Details
+                          )}
                         </button>
                       </td>
                     </tr>
                     {openStates[subId] && (
                       <tr>
-                        <td colSpan={5} className="p-4">
+                        <td colSpan={5} className="p-4 bg-gray-100">
                           <div>
-                            <h3 className="font-bold mb-2">
+                            <h3 className="font-bold text-lg mb-2">
                               Attendance Details
                             </h3>
-                            <table className="min-w-full table-auto">
-                              <thead>
+                            <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                              <thead className="bg-gray-200">
                                 <tr>
-                                  <th>Date</th>
-                                  <th className="text-right">Status</th>
+                                  <th className="px-4 py-2 text-left">Date</th>
+                                  <th className="px-4 py-2 text-right">
+                                    Status
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -132,9 +200,11 @@ const ViewStudentAttendance: React.FC = () => {
                                         ? date.toISOString().substring(0, 10)
                                         : "Invalid Date";
                                     return (
-                                      <tr key={index}>
-                                        <td>{dateString}</td>
-                                        <td className="text-right">
+                                      <tr key={index} className="border-t">
+                                        <td className="px-4 py-2">
+                                          {dateString}
+                                        </td>
+                                        <td className="text-right px-4 py-2">
                                           {data.status}
                                         </td>
                                       </tr>

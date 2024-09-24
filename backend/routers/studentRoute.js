@@ -4,9 +4,13 @@ const studentCtrl = require("../controllers/studentController");
 
 router.post("/register", studentCtrl.studentRegister);
 router.post("/login", studentCtrl.studentLogin);
+router.post("/enroll", studentCtrl.enrollSubject);
+router.post("/drop-subject", studentCtrl.dropSubject);
+router.post("/available-subjects", studentCtrl.getAvailableSubjects);
 
 router.get("/get-all-students/:id", studentCtrl.getStudents);
 router.get("/infor/:id", studentCtrl.getStudentDetails);
+router.post("/enrolled-subject", studentCtrl.getEnrolledSubjects);
 
 router.delete("/delete-many-student/:id", studentCtrl.deleteManyStudents);
 router.delete(

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TableTemplate from "../function/DataTable";
 import { useAuth } from "@/api/useAuth";
-import { Loader } from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 
 interface ChooseClassProps {
   situation: "Teacher" | "Subject";
@@ -51,6 +51,10 @@ const ChooseClass: React.FC<ChooseClassProps> = ({ situation }) => {
 
   return (
     <>
+      <ArrowLeft
+        onClick={() => navigate(-1)}
+        className="bg-blue-500 text-white mb-8"
+      />
       {Array.isArray(sclasses) && sclasses.length > 0 ? (
         <>
           <h2 className="text-lg font-semibold mb-4">Choose a class</h2>

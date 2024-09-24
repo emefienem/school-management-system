@@ -64,7 +64,7 @@ const Sidebar = () => {
             to="/dashboard"
             title="Dashboard"
             Icon={LucideLayoutDashboard}
-            allowedRoles={["Admin", "teacher", "Student"]}
+            allowedRoles={["Admin", "teacher", "Parent", "Student"]}
           />
           <SidebarItem
             to="/admin/classes"
@@ -96,6 +96,12 @@ const Sidebar = () => {
             Icon={ClipboardIcon}
             allowedRoles={["Admin"]}
           />
+          {/* <SidebarItem
+            to="/admin/set-fee"
+            title="Set Fee"
+            Icon={ClipboardIcon}
+            allowedRoles={["Admin"]}
+          /> */}
           <SidebarItem
             to="/admin/notices"
             title="Notices"
@@ -121,6 +127,12 @@ const Sidebar = () => {
             allowedRoles={["teacher"]}
           />
           <SidebarItem
+            to="/student/enroll"
+            title="Enroll"
+            Icon={ClipboardIcon}
+            allowedRoles={["Student"]}
+          />
+          <SidebarItem
             to="/student/subjects"
             title="Subjects"
             Icon={ClipboardIcon}
@@ -138,12 +150,30 @@ const Sidebar = () => {
             Icon={MessageCircle}
             allowedRoles={["Student"]}
           />
+          <SidebarItem
+            to="/parent/complain"
+            title="Complain"
+            Icon={MessageCircle}
+            allowedRoles={["Parent"]}
+          />
+          <SidebarItem
+            to="/parent/view-child"
+            title="Children"
+            Icon={MessageCircle}
+            allowedRoles={["Parent"]}
+          />
+          <SidebarItem
+            to="/parent/pay-fee"
+            title="School fees"
+            Icon={MessageCircle}
+            allowedRoles={["Parent"]}
+          />
           {accessToken && accessToken !== "access" && (
             <SidebarItem
               to="/logout"
               title="Logout"
               Icon={LogOutIcon}
-              allowedRoles={["Admin", "teacher", "Student"]}
+              allowedRoles={["Admin", "teacher", "Parent", "Student"]}
             />
           )}
         </div>
@@ -159,7 +189,7 @@ const Sidebar = () => {
               to="/dashboard"
               title="Dashboard"
               Icon={LucideLayoutDashboard}
-              allowedRoles={["Admin", "teacher", "Student"]}
+              allowedRoles={["Admin", "teacher", "Parent", "Student"]}
             />
             <SidebarItem
               to="/admin/classes"
@@ -216,6 +246,12 @@ const Sidebar = () => {
               allowedRoles={["teacher"]}
             />
             <SidebarItem
+              to="/student/enroll"
+              title="Enroll"
+              Icon={ClipboardIcon}
+              allowedRoles={["Student"]}
+            />
+            <SidebarItem
               to="/student/subjects"
               title="Subjects"
               Icon={ClipboardIcon}
@@ -233,12 +269,30 @@ const Sidebar = () => {
               Icon={MessageCircle}
               allowedRoles={["Student"]}
             />
+            <SidebarItem
+              to="/parent/complain"
+              title="Complain"
+              Icon={MessageCircle}
+              allowedRoles={["Parent"]}
+            />
+            <SidebarItem
+              to="/parent/view-child"
+              title="Children"
+              Icon={MessageCircle}
+              allowedRoles={["Parent"]}
+            />
+            <SidebarItem
+              to="/parent/pay-fee"
+              title="School fees"
+              Icon={MessageCircle}
+              allowedRoles={["Parent"]}
+            />
             {accessToken && accessToken !== "access" && (
               <SidebarItem
                 to="/logout"
                 title="Logout"
                 Icon={LogOutIcon}
-                allowedRoles={["Admin", "teacher", "Student"]}
+                allowedRoles={["Admin", "teacher", "Parent", "Student"]}
               />
             )}
           </div>

@@ -170,44 +170,6 @@ const adminCtrl = {
       res.status(500).json({ message: error.message });
     }
   },
-  checkAndDisableAccounts: async () => {
-    try {
-      const unpaidFees = await prisma.fee.findMany({
-        where: {
-          isPaid: false,
-          paymentDate: null,
-        },
-      });
-
-      const studentIds = unpaidFees.map((fee) => fee.studentId);
-
-      await prisma.student.updateMany({
-        where: {
-          id: {
-            in: studentIds,
-          },
-        },
-        data: {
-          disabled: true,
-        },
-      });
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  },
-  getUnpaidFees: async (req, res) => {
-    try {
-      const unpaidFees = await prisma.fee.findMany({
-        where: {
-          paid: false,
-        },
-      });
-
-      res.send(unpaidFees);
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  },
 };
 
 module.exports = adminCtrl;

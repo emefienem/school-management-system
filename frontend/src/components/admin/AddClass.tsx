@@ -36,11 +36,11 @@ const AddClass: React.FC = () => {
   const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoader(true);
-    const Id = toast.loading("Adding class....");
+    const Id = toast.loading("Adding class....", { duration: 4000 });
     try {
       addStuff(fields, address);
     } catch (error: any) {
-      toast.error(error || "An error occurred");
+      toast.error(error || "An error occurred", { duration: 4000 });
     } finally {
       toast.dismiss(Id);
     }
@@ -48,7 +48,7 @@ const AddClass: React.FC = () => {
 
   useEffect(() => {
     if (getstatus === "added" && details) {
-      toast.success("Added the class");
+      toast.success("Added the class", { duration: 3000 });
       if (Array.isArray(details)) {
         if (details.length > 0 && details[0]?.id) {
           navigate("/admin/classes/class/" + details[0].id);
@@ -110,7 +110,7 @@ const AddClass: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="w-full px-4 py-2 mt-3 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 mt-3 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
               >
                 Go Back
               </button>

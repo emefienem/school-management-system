@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader, UserMinus, UserPlus } from "lucide-react";
-import TableTemplate from "../function/DataTable";
+import { ArrowLeft, EyeIcon, Loader, UserMinus, UserPlus } from "lucide-react";
 import Popup from "../function/Popup";
 import { useAuth } from "@/api/useAuth";
-import SLG from "../../assets/slg.png";
 import QuickActionDial from "../function/QuickActionDial";
 
 interface Teacher {
@@ -120,7 +118,7 @@ const ShowTeachers: React.FC = () => {
     <div className="w-full overflow-hidden">
       <ArrowLeft
         onClick={() => navigate(-1)}
-        className="bg-blue-500 text-white mb-8"
+        className="bg-blue-500 text-white mb-8 cursor-pointer"
       />
       <div className="w-full overflow-x-auto">
         <table className="min-w-full table-auto">
@@ -189,7 +187,7 @@ const ShowTeachers: React.FC = () => {
                         navigate("/admin/teachers/teacher/" + row.id)
                       }
                     >
-                      View
+                      <EyeIcon />
                     </button>
                   </td>
                 </tr>

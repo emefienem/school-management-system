@@ -10,91 +10,94 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:emefienem@localhost:5432/mydb?schema=public"
 }
 
-
 model Admin {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String    @unique
-  password   String
-  role       String    @default("Admin")
-  schoolName String    @unique
-  teachers   Teacher[]
-  students   Student[]
-  parents    Parent[]
-  subjects   Subject[]
-  sclasses   Sclass[]
-  complains  Complain[]
-  notices    Notice[]
+  id             Int            @id @default(autoincrement())
+  name           String
+  email          String         @unique
+  password       String
+  role           String         @default("Admin")
+  schoolName     String         @unique
+  teachers       Teacher[]
+  students       Student[]
+  parents        Parent[]
+  subjects       Subject[]
+  sclasses       Sclass[]
+  complains      Complain[]
+  notices        Notice[]
+  feeStructure   FeeStructure[]
+  feeStructureId Int            @default(1)
 }
 
 model Teacher {
-  id              Int            @id @default(autoincrement())
-  name            String
-  email           String         @unique
-  password        String
-  role            String         @default("Teacher")
-  school          Admin          @relation(fields: [schoolId], references: [id])
-  teachSubjectId  Int?           @unique
-  teachSubject    Subject?       @relation(fields: [teachSubjectId], references: [id])
-  schoolId        Int
-  teachSclass     Sclass?        @relation("TeacherSclass", fields: [teachSclassId], references: [id])
-  teachSclassId   Int?
-  attendance      Attendance[]
-  complains       Complain[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id             Int          @id @default(autoincrement())
+  name           String
+  email          String       @unique
+  password       String
+  role           String       @default("Teacher")
+  school         Admin        @relation(fields: [schoolId], references: [id])
+  teachSubjectId Int?         @unique
+  teachSubject   Subject?     @relation(fields: [teachSubjectId], references: [id])
+  schoolId       Int
+  teachSclass    Sclass?      @relation("TeacherSclass", fields: [teachSclassId], references: [id])
+  teachSclassId  Int?
+  attendance     Attendance[]
+  complains      Complain[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model Attendance {
-  id            Int       @id @default(autoincrement())
-  teacher       Teacher   @relation(fields: [teacherId], references: [id])
-  teacherId     Int
-  date          DateTime
-  presentCount  String?
-  absentCount   String?
-  student       Student   @relation(fields: [studentId], references: [id])
-  studentId     Int
-  status        String
-  subName       Subject    @relation(fields: [subNameId], references: [id])
-  subNameId     Int
-  sessions      Int       @default(0)
+  id           Int      @id @default(autoincrement())
+  teacher      Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId    Int?
+  date         DateTime
+  presentCount String?
+  absentCount  String?
+  student      Student  @relation(fields: [studentId], references: [id])
+  studentId    Int
+  status       String
+  subName      Subject  @relation(fields: [subNameId], references: [id])
+  subNameId    Int
+  sessions     Int      @default(0)
 }
 
 model Subject {
-  id            Int        @id @default(autoincrement())
-  subName       String
-  subCode       String
-  sessions      String
-  sclass        Sclass     @relation(fields: [sclassId], references: [id])
-  sclassId      Int
-  school        Admin      @relation(fields: [schoolId], references: [id])
-  schoolId      Int
-  teacher       Teacher?   
-  teacherId     Int?
-  examResults   ExamResult[]
-  attendances   Attendance[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id          Int          @id @default(autoincrement())
+  subName     String
+  subCode     String
+  sessions    String
+  sclass      Sclass       @relation(fields: [sclassId], references: [id])
+  sclassId    Int
+  school      Admin        @relation(fields: [schoolId], references: [id])
+  schoolId    Int
+  teacher     Teacher?
+  teacherId   Int?
+  examResults ExamResult[]
+  attendances Attendance[]
+  enrollment  Enrollment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Sclass {
-  id          Int        @id @default(autoincrement())
-  sclassName  String
-  school      Admin      @relation(fields: [schoolId], references: [id])
-  schoolId    Int
-  teachers    Teacher[]  @relation("TeacherSclass")
-  students    Student[]
-  subjects    Subject[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id         Int       @id @default(autoincrement())
+  sclassName String
+  school     Admin     @relation(fields: [schoolId], references: [id])
+  schoolId   Int
+  teachers   Teacher[] @relation("TeacherSclass")
+  students   Student[]
+  subjects   Subject[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Student {
   id          Int          @id @default(autoincrement())
   name        String
+  email       String       @unique
   rollNum     Int
   password    String
   sclass      Sclass       @relation(fields: [sclassId], references: [id])
@@ -109,53 +112,86 @@ model Student {
   fees        Fee[]
   disabled    Boolean      @default(false)
   complains   Complain[]
+  enrollment  Enrollment[]
+}
+
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  subjectId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+  subject Subject @relation(fields: [subjectId], references: [id])
+
+  @@unique([studentId, subjectId])
 }
 
 model ExamResult {
-  id            Int       @id @default(autoincrement())
-  student       Student   @relation(fields: [studentId], references: [id])
+  id            Int     @id @default(autoincrement())
+  student       Student @relation(fields: [studentId], references: [id])
   studentId     Int
-  subName       Subject    @relation(fields: [subNameId], references: [id])
+  subName       Subject @relation(fields: [subNameId], references: [id])
   subNameId     Int
-  marksObtained Int        @default(0)
+  marksObtained Int     @default(0)
 }
 
 model Parent {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String    @unique
-  password   String
-  role       String    @default("Parent")
-  school     Admin     @relation(fields: [schoolId], references: [id])
-  schoolId   Int
-  children   Student[]
-  fees       Fee[]
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  role      String     @default("Parent")
+  school    Admin      @relation(fields: [schoolId], references: [id])
+  schoolId  Int
+  children  Student[]
+  fees      Fee[]
+  complains Complain[]
 }
 
 model Fee {
-  id          Int      @id @default(autoincrement())
-  student     Student  @relation(fields: [studentId], references: [id])
-  studentId   Int
-  term        String   
-  amount      Float
-  isPaid      Boolean  @default(false)
-  paymentDate DateTime?
-  parent      Parent?  @relation(fields: [parentId], references: [id])
-  parentId    Int?
+  id             Int          @id @default(autoincrement())
+  student        Student      @relation(fields: [studentId], references: [id])
+  studentId      Int
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id])
+  feeStructureId Int
+  isPaid         Boolean      @default(false)
+  paymentDate    DateTime?
+  parent         Parent?      @relation(fields: [parentId], references: [id])
+  parentId       Int?
+  totalPaid      Float        @default(0)
+  paymentType    String?
+  dueDate        DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model FeeStructure {
+  id        Int      @id @default(autoincrement())
+  school    Admin    @relation(fields: [schoolId], references: [id])
+  schoolId  Int
+  amount    Float
+  duration  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  fees      Fee[]
 }
 
 model Complain {
-  id         Int      @id @default(autoincrement())
-  student    Student? @relation(fields: [studentId], references: [id])
-  studentId  Int?
-  teacher    Teacher? @relation(fields: [teacherId], references: [id])
-  teacherId  Int?
-  date       DateTime
-  complaint  String
-  school     Admin    @relation(fields: [schoolId], references: [id])
-  schoolId   Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId Int?
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId Int?
+  parent    Parent?  @relation(fields: [parentId], references: [id])
+  parentId  Int?
+  date      DateTime
+  complaint String
+  school    Admin    @relation(fields: [schoolId], references: [id])
+  schoolId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Notice {
@@ -167,4 +203,11 @@ model Notice {
   schoolId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime
 }

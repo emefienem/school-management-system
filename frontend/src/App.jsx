@@ -36,21 +36,30 @@ import StudentComplain from "./components/student/StudentComplain";
 import ViewStudentAttendance from "./components/student/ViewStudentAttendance";
 import StudentSubjects from "./components/student/StudentSubjects";
 import ShowParents from "./components/admin/ShowParents";
+import AddParent from "./components/admin/AddParent";
+import ForgotPassword from "./components/ForgotPassword";
+import ParentComplain from "./components/parent/ParentComplain";
+import ViewChildren from "./components/parent/ViewChildren";
+import PayFee from "./components/parent/PayFee";
+import SetFee from "./components/admin/SetFee";
+import Enroll from "./components/student/Enroll";
+
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />
-        <Route path="/sign" element={<Signup />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route element={<CPDLayout />}>
           <Route path="/logout" element={<Logout />} />
 
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute roles={["Admin", "teacher", "Student"]}>
+              <ProtectedRoute roles={["Admin", "teacher", "Parent", "Student"]}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -58,8 +67,16 @@ const App = () => {
           <Route
             path="/profile"
             element={
-              <ProtectedRoute roles={["Admin", "teacher", "Student"]}>
+              <ProtectedRoute roles={["Admin", "teacher", "Parent", "Student"]}>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/set-fee"
+            element={
+              <ProtectedRoute roles={["Admin"]}>
+                <SetFee />
               </ProtectedRoute>
             }
           />
@@ -71,7 +88,6 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/admin/add-notice"
             element={
@@ -177,6 +193,14 @@ const App = () => {
             element={
               <ProtectedRoute roles={["Admin"]}>
                 <ViewStudent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/add-parents"
+            element={
+              <ProtectedRoute roles={["Admin"]}>
+                <AddParent />
               </ProtectedRoute>
             }
           />
@@ -298,6 +322,14 @@ const App = () => {
             }
           />
           <Route
+            path="/student/enroll"
+            element={
+              <ProtectedRoute roles={["Student"]}>
+                <Enroll />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/student/subjects"
             element={
               <ProtectedRoute roles={["Student"]}>
@@ -318,6 +350,30 @@ const App = () => {
             element={
               <ProtectedRoute roles={["Student"]}>
                 <StudentComplain />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/parent/complain"
+            element={
+              <ProtectedRoute roles={["Parent"]}>
+                <ParentComplain />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/parent/view-child"
+            element={
+              <ProtectedRoute roles={["Parent"]}>
+                <ViewChildren />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/parent/pay-fee"
+            element={
+              <ProtectedRoute roles={["Parent"]}>
+                <PayFee />
               </ProtectedRoute>
             }
           />

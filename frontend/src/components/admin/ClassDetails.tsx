@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { Trash2, PlusCircle, UserPlus, UserX, Loader } from "lucide-react";
+import {
+  Trash2,
+  PlusCircle,
+  UserPlus,
+  UserX,
+  Loader,
+  EyeIcon,
+} from "lucide-react";
 import Popup from "../function/Popup";
 import { useAuth } from "@/api/useAuth";
 import QuickActionDial from "../function/QuickActionDial";
@@ -54,10 +61,6 @@ const ClassDetails = () => {
     }
   }, [classID, getClassStudents, getSubjectList, getClassDetails]);
 
-  if (error) {
-    console.log(error);
-  }
-
   const [value, setValue] = useState<number>(0);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
@@ -74,18 +77,21 @@ const ClassDetails = () => {
     { id: "code", label: "Subject Code", minWidth: 100 },
   ];
 
-  const subjectRows =
-    Array.isArray(subjectsList) && subjectsList.length > 0
-      ? subjectsList.map((subject: Subject) => ({
-          name: subject.subName,
-          code: subject.subCode,
-          id: subject.id,
-        }))
-      : [];
+  const targetSclassId = sclassDetails?.id;
+
+  const filteredSubjects = Array.isArray(subjectsList)
+    ? subjectsList.filter((subject) => subject?.sclassId === targetSclassId)
+    : [];
+
+  const subjectRows = filteredSubjects.map((subject: Subject) => ({
+    name: subject.subName,
+    code: subject.subCode,
+    id: subject.id,
+  }));
 
   const SubjectsButtonHaver = ({ row }: ButtonHaverProps) => {
     return (
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 justify-center">
         <button
           onClick={() => deleteHandler(row.id, "subject")}
           className="text-red-500"
@@ -98,7 +104,7 @@ const ClassDetails = () => {
           }}
           className="text-blue-500"
         >
-          View
+          <EyeIcon />
         </button>
       </div>
     );
@@ -120,7 +126,7 @@ const ClassDetails = () => {
   const ClassSubjectsSection = () => {
     return (
       <>
-        {getresponse ? (
+        {filteredSubjects.length === 0 ? (
           <div className="flex justify-end mt-4">
             <button
               onClick={() => navigate("/admin/add-subject/" + classID)}
@@ -159,7 +165,7 @@ const ClassDetails = () => {
 
   const StudentsButtonHaver = ({ row }: ButtonHaverProps) => {
     return (
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 justify-center">
         <button
           onClick={() => deleteHandler(row.id, "Student")}
           className="text-red-500"
@@ -170,15 +176,15 @@ const ClassDetails = () => {
           onClick={() => navigate("/admin/students/student/" + row.id)}
           className="text-blue-500"
         >
-          View
+          <EyeIcon />
         </button>
         <button
           onClick={() =>
             navigate("/admin/students/student/attendance/" + row.id)
           }
-          className="text-purple-500"
+          className="text-white bg-orange-500 px-4 py-2 rounded-lg"
         >
-          Attendance
+          View Attendance
         </button>
       </div>
     );
@@ -234,32 +240,64 @@ const ClassDetails = () => {
   };
 
   const ClassDetailsSection = () => {
-    const numberOfSubjects = Array.isArray(subjectsList)
-      ? subjectsList.length
-      : 0;
-    const numberOfStudents = Array.isArray(sclassStudents)
-      ? sclassStudents.length
-      : 0;
+    const targetSclassId = sclassDetails?.id;
+
+    const filteredSubjects = Array.isArray(subjectsList)
+      ? subjectsList.filter((subject) => subject?.sclassId === targetSclassId)
+      : [];
+
+    const numberOfSubjects = filteredSubjects.length;
+
+    const filteredStudents = Array.isArray(sclassStudents)
+      ? sclassStudents.filter((student) => student?.sclassId === targetSclassId)
+      : [];
+
+    const numberOfStudents = filteredStudents.length;
+    // const numberOfStudents = Array.isArray(sclassStudents)
+    //   ? sclassStudents.length
+    //   : 0;
     return (
       <>
         <h1 className="text-3xl font-semibold mb-4 uppercase tracking-tight text-blue-500">
           Class Details
         </h1>
-        <div className="text-center space-y-12">
-          <h2 className="text-xl font-semibold mb-2">
-            class{" "}
+        <div className="overflow-x-auto">
+          <h2 className="text-xl font-semibold mb-2 text-center">
+            Class{" "}
             <span className="text-blue-500 font-bold">
-              {sclassDetails && sclassDetails.sclassName}
+              {sclassDetails?.sclassName}
             </span>
           </h2>
-          <p className="text-lg mb-2 uppercase font-bold">
-            Number of Subjects:{" "}
-            <span className="text-blue-500">{numberOfSubjects}</span>
-          </p>
-          <p className="text-lg mb-2 uppercase font-bold">
-            Number of Students:{" "}
-            <span className="text-blue-500">{numberOfStudents}</span>
-          </p>
+          <table className="min-w-full border border-gray-300 text-center">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="py-2 px-4 border-b text-gray-600 font-bold">
+                  Attribute
+                </th>
+                <th className="py-2 px-4 border-b text-gray-600 font-bold">
+                  Details
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                  Number of Subjects
+                </td>
+                <td className="py-2 px-4 border-b text-blue-500">
+                  {numberOfSubjects}
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2 px-4 border-b text-gray-800 font-bold">
+                  Number of Students
+                </td>
+                <td className="py-2 px-4 border-b text-blue-500">
+                  {numberOfStudents}
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
           <div className="flex space-x-4 justify-center items-center mt-5">
             {getresponse && (

@@ -34,24 +34,6 @@ const subjectCtrl = {
     }
   },
 
-  // allSubjects: async (req, res) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const subjects = await prisma.subject.findMany({
-  //       where: { schoolId: parseInt(id) },
-  //       include: { sclassName: true },
-  //     });
-
-  //     if (subjects.length > 0) {
-  //       res.send(subjects);
-  //     } else {
-  //       res.send({ message: "No subjects found" });
-  //     }
-  //   } catch (err) {
-  //     res.status(500).json(err);
-  //   }
-  // },
-
   allSubjects: async (req, res) => {
     try {
       const { id } = req.params;

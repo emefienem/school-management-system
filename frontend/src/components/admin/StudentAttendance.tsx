@@ -12,6 +12,8 @@ interface StudentAttendanceProps {
   situation: "Student" | "Subject";
 }
 
+type Params = Record<string, string | undefined>;
+
 const StudentAttendance: React.FC<StudentAttendanceProps> = ({ situation }) => {
   const navigate = useNavigate();
 

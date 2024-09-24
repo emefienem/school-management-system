@@ -82,7 +82,7 @@ const SubjectForm: React.FC = () => {
       subName: subject.subName,
       subCode: subject.subCode,
       sessions: subject.sessions,
-      sclassId: parseInt(sclassName), // IDK
+      sclassId: parseInt(sclassName),
     })),
     adminID,
   };

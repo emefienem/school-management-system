@@ -160,7 +160,7 @@ const ViewStudent: React.FC = () => {
       return (
         <div>
           <h3 className="text-lg font-semibold mb-4">Attendance:</h3>
-          <table className="min-w-full bg-white">
+          {/* <table className="min-w-full bg-white">
             <thead>
               <tr className="w-full bg-gray-200">
                 <th className="py-2">Subject</th>
@@ -249,6 +249,128 @@ const ViewStudent: React.FC = () => {
                 );
               }
             )}
+          </table> */}
+          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="py-4 px-6 text-left text-sm font-medium text-gray-700">
+                  Subject
+                </th>
+                <th className="py-4 px-6 text-left text-sm font-medium text-gray-700">
+                  Present
+                </th>
+                <th className="py-4 px-6 text-left text-sm font-medium text-gray-700">
+                  Total Sessions
+                </th>
+                <th className="py-4 px-6 text-left text-sm font-medium text-gray-700">
+                  Attendance Percentage
+                </th>
+                <th className="py-4 px-6 text-center text-sm font-medium text-gray-700">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            {Object.entries(groupAttendanceBySubject(subjectAttendance)).map(
+              ([subName, { present, allData, subId, sessions }], index) => {
+                const subjectAttendancePercentage =
+                  calculateSubjectAttendancePercentage(present, sessions);
+                return (
+                  <tbody key={index}>
+                    <tr className="bg-gray-100 hover:bg-gray-50 transition duration-300">
+                      <td className="py-4 px-6 text-sm font-medium text-gray-700">
+                        {subName}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-600">
+                        {present}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-600">
+                        {sessions}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-600">
+                        {subjectAttendancePercentage}%
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <div className="flex justify-center items-center space-x-4">
+                          <button
+                            className="text-blue-600 hover:text-blue-900 flex items-center transition-colors"
+                            onClick={() => handleOpen(subId)}
+                          >
+                            {openStates[subId] ? (
+                              <ChevronUp />
+                            ) : (
+                              <ChevronDown />
+                            )}{" "}
+                          </button>
+                          <button
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                            onClick={() => removeSubAttendance(subId)}
+                          >
+                            <Trash className="inline-block mr-1" />
+                          </button>
+                          <button
+                            className="text-green-600 hover:text-green-900 transition-colors"
+                            onClick={() =>
+                              navigate(
+                                `/admin/subject/student/attendance/${studentID}/${subId}`
+                              )
+                            }
+                          >
+                            Change
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {openStates[subId] && (
+                      <tr>
+                        <td colSpan={5} className="py-4 px-6">
+                          <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
+                            <h4 className="text-sm font-semibold mb-2 text-gray-700">
+                              Attendance Details
+                            </h4>
+                            <table className="min-w-full bg-white border border-gray-200 rounded-md">
+                              <thead>
+                                <tr className="bg-gray-100">
+                                  <th className="py-2 px-4 text-left text-xs font-medium text-gray-600">
+                                    Date
+                                  </th>
+                                  <th className="py-2 px-4 text-right text-xs font-medium text-gray-600">
+                                    Status
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {allData.map(
+                                  (data: DataType, index: number) => {
+                                    const date = new Date(data.date);
+                                    const dateString =
+                                      date.toString() !== "Invalid Date"
+                                        ? date.toISOString().substring(0, 10)
+                                        : "Invalid Date";
+                                    return (
+                                      <tr
+                                        key={index}
+                                        className="bg-white hover:bg-gray-50 transition duration-300"
+                                      >
+                                        <td className="py-2 px-4 text-sm text-gray-700">
+                                          {dateString}
+                                        </td>
+                                        <td className="py-2 px-4 text-right text-sm text-gray-700">
+                                          {data.status}
+                                        </td>
+                                      </tr>
+                                    );
+                                  }
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                );
+              }
+            )}
           </table>
           <div className="mt-4">
             Overall Attendance Percentage:{" "}
@@ -259,7 +381,7 @@ const ViewStudent: React.FC = () => {
               className="text-red-600 hover:text-red-900"
               onClick={() => deleteHandler()}
             >
-              <Trash /> Delete All
+              <Trash />
             </button>
             <button
               className="text-green-600 hover:text-green-900"
@@ -319,7 +441,7 @@ const ViewStudent: React.FC = () => {
                   }`}
                   onClick={() => setShowTab("table")}
                 >
-                  <Table /> Table
+                  <Table className="size-9" />
                 </button>
                 <button
                   className={`p-2 ${
@@ -329,7 +451,7 @@ const ViewStudent: React.FC = () => {
                   }`}
                   onClick={() => setShowTab("chart")}
                 >
-                  <BarChart2 /> Chart
+                  <BarChart2 className="size-9" />
                 </button>
               </div>
             </div>
@@ -378,31 +500,70 @@ const ViewStudent: React.FC = () => {
             className="border p-2 rounded-lg w-full"
             disabled
           />
-          <button
+          {/* <button
             type="submit"
             className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
           >
             Update Details
-          </button>
+          </button> */}
         </form>
       </div>
 
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Subject Marks:</h3>
         {subjectMarks ? (
-          <table className="min-w-full bg-white">
+          // <table className="min-w-full bg-white">
+          //   <thead>
+          //     <tr className="bg-gray-200">
+          //       <th className="py-2">Subject</th>
+          //       <th className="py-2">Marks</th>
+          //     </tr>
+          //   </thead>
+          //   <tbody>
+          //     {userDetails.examResults.map(
+          //       (
+          //         result: {
+          //           subName: { subName: string };
+          //           marksObtained: number;
+          //         },
+          //         index: number
+          //       ) => (
+          //         <tr key={index}>
+          //           <td>{result.subName?.subName || "N/A"}</td>
+          //           <td>{result.marksObtained || "N/A"}</td>
+          //         </tr>
+          //       )
+          //     )}
+          //   </tbody>
+          // </table>
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
             <thead>
-              <tr className="bg-gray-200">
-                <th className="py-2">Subject</th>
-                <th className="py-2">Marks</th>
+              <tr className="bg-gray-200 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="py-3 px-4 border-b border-gray-300">Subject</th>
+                <th className="py-3 px-4 border-b border-gray-300">Marks</th>
               </tr>
             </thead>
             <tbody>
-              {Object.entries(subjectMarks).map(
-                ([subjectName, marks], index) => (
-                  <tr key={index} className="bg-gray-100">
-                    <td className="py-2">{subjectName}</td>
-                    <td className="py-2">{marks}</td>
+              {userDetails?.examResults?.map(
+                (
+                  result: {
+                    subName: { subName: string };
+                    marksObtained: number;
+                  },
+                  index: number
+                ) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                    } hover:bg-gray-100 transition-colors duration-200`}
+                  >
+                    <td className="py-3 px-4 border-b border-gray-200">
+                      {result.subName?.subName || "N/A"}
+                    </td>
+                    <td className="py-3 px-4 border-b border-gray-200">
+                      {result.marksObtained || "N/A"}
+                    </td>
                   </tr>
                 )
               )}

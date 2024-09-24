@@ -23,13 +23,16 @@ const PORT = process.env.PORT || 5001;
 
 app.use("/admin", require("./routers/adminRoute"));
 app.use("/teacher", require("./routers/teacherRoute"));
+app.use("/parent", require("./routers/parentRoute"));
 app.use("/student", require("./routers/studentRoute"));
 app.use("/subject", require("./routers/subjectRoute"));
 app.use("/class", require("./routers/classRoute"));
 app.use("/complain", require("./routers/complainRoute"));
 app.use("/notice", require("./routers/noticeRoute"));
 
-app.use("/auth", require("./routers/refreshRoute"));
+app.use("/auth", require("./routers/authRoute"));
+
+app.use("/fee", require("./routers/feeRoute"));
 
 async function main() {
   try {

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FilePlus, Trash2Icon } from "lucide-react";
+import { ArrowLeft, FilePlus, Loader, Trash2Icon } from "lucide-react";
 import TableTemplate from "../function/DataTable";
 import QuickActionDial from "../function/QuickActionDial";
 import { useAuth } from "@/api/useAuth";
@@ -78,9 +78,23 @@ const ShowNotices: React.FC = () => {
   return (
     <div className="p-4">
       {loading ? (
-        <div>Loading...</div>
+        <>
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
+          <div className="text-center flex justify-center items-center py-4">
+            <div className="flex justify-center items-center h-screen">
+              <Loader className="animate-spin w-12 h-12 text-purple-600" />
+            </div>
+          </div>
+        </>
       ) : (
         <>
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 text-white mb-8"
+          />
           {getresponse ? (
             <div className="flex justify-end mt-4">
               <button

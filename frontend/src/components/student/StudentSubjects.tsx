@@ -3,6 +3,7 @@ import BarCharts from "../function/BarCharts";
 import { ArrowLeft, BarChart, Loader, Table as TableIcon } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const StudentSubjects: React.FC = () => {
   const navigate = useNavigate();
@@ -14,24 +15,29 @@ const StudentSubjects: React.FC = () => {
     subjectsList,
     getClassDetails,
     sclassDetails,
+    dropSubject,
     loading,
     getresponse,
     error,
+    getEnrolledSubjects,
+    enrolledSubjects,
+    getAvailableSubjects,
   } = useAuth();
   const classID = currentUser?.user?.sclassId;
   const subjectID = currentUser?.user?.schoolId;
 
   const ID = currentUser?.user?.id;
+  const studentId = currentUser?.user?.id;
+
   useEffect(() => {
     getClassDetails(classID, "class");
     getUserDetails(ID, "student");
     getSubjectList(subjectID, "subject");
+    getEnrolledSubjects(studentId);
   }, [ID]);
 
   if (getresponse) {
     console.log(getresponse);
-  } else if (error) {
-    console.log(error);
   }
 
   const [subjectMarks, setSubjectMarks] = useState<any[]>([]);
@@ -41,7 +47,7 @@ const StudentSubjects: React.FC = () => {
 
   useEffect(() => {
     if (userDetails) {
-      setSubjectMarks(userDetails.examResult || []);
+      setSubjectMarks(userDetails.examResults || []);
     }
   }, [userDetails]);
 
@@ -54,30 +60,118 @@ const StudentSubjects: React.FC = () => {
     setSelectedSection(newSection);
   };
 
+  const renderEnrolledSubjectsTable = () => {
+    const handleDropSubject = async (subjectId: string) => {
+      try {
+        await dropSubject(ID, subjectId);
+
+        await getAvailableSubjects(studentId);
+      } catch (error: any) {
+        toast.error(error.message, { duration: 4000 });
+      }
+    };
+    return (
+      <div className="overflow-x-auto pb-20">
+        <h2 className="text-2xl font-semibold text-center my-4">
+          Enrolled Subjects
+        </h2>
+        <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-3 border-b text-left text-gray-700 font-bold">
+                Subject Name
+              </th>
+              <th className="px-6 py-3 border-b text-left text-gray-700 font-bold">
+                Subject Code
+              </th>
+              <th className="py-2 px-4 border-b text-gray-600 font-bold">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {enrolledSubjects.length > 0 ? (
+              enrolledSubjects.map((enrollment, index) => (
+                <tr
+                  key={index}
+                  className="border-t hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 border-b text-gray-800 ">
+                    {enrollment.subject.subName}
+                  </td>
+                  <td className="px-6 py-4 border-b text-gray-800 ">
+                    {enrollment.subject.subCode}
+                  </td>
+                  <td className="py-2 px-4 border-b text-blue-500 text-center">
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:underline"
+                      onClick={() => handleDropSubject(enrollment.subject.id)}
+                    >
+                      Drop
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={2} className="px-6 py-4 text-center text-gray-600">
+                  No enrolled subjects
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   const renderTableSection = () => (
     <>
-      <h2 className="text-2xl font-semibold text-center my-4">Subject Marks</h2>
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border-b">Subject</th>
-            <th className="px-4 py-2 border-b">Marks</th>
-          </tr>
-        </thead>
-        <tbody>
-          {subjectMarks.map((result, index) => {
-            if (!result.subName || !result.marksObtained) {
-              return null;
-            }
-            return (
-              <tr key={index} className="border-t">
-                <td className="px-4 py-2 border-b">{result.subName.subName}</td>
-                <td className="px-4 py-2 border-b">{result.marksObtained}</td>
+      <h2 className="text-2xl font-semibold text-center my-4 text-blue-500">
+        Subject Marks
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-3 border-b text-left text-gray-700 font-bold">
+                Subject
+              </th>
+              <th className="px-6 py-3 border-b text-left text-gray-700 font-bold">
+                Marks
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {subjectMarks.length > 0 ? (
+              subjectMarks.map((result, index) => {
+                if (!result.subName || !result.marksObtained) {
+                  return null;
+                }
+                return (
+                  <tr
+                    key={index}
+                    className="border-t hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4 border-b text-gray-800">
+                      {result.subName.subName}
+                    </td>
+                    <td className="px-6 py-4 border-b text-gray-800">
+                      {result.marksObtained}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={2} className="px-6 py-4 text-center text-gray-600">
+                  No marks available
+                </td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 
@@ -85,21 +179,60 @@ const StudentSubjects: React.FC = () => {
     <BarCharts chartData={subjectMarks} dataKey="marksObtained" />
   );
 
-  const renderClassDetailsSection = () => (
-    <div className="container mx-auto">
-      <h2 className="text-2xl font-semibold text-center my-4">Class Details</h2>
-      <h3 className="text-xl font-medium mb-4">
-        You are currently in class: {sclassDetails && sclassDetails.sclassName}
-      </h3>
-      <h4 className="text-lg font-medium mb-2">The subjects:</h4>
-      {subjectsList &&
-        subjectsList.map((subject, index) => (
-          <p key={index} className="text-base">
-            {subject.subName} ({subject.subCode})
-          </p>
-        ))}
-    </div>
-  );
+  const renderClassDetailsSection = () => {
+    const filteredSubjects = subjectsList.filter(
+      (subject) => subject?.sclassId === userDetails?.sclassId
+    );
+    return (
+      <div className="container mx-auto p-6">
+        <h2 className="text-2xl font-semibold text-center my-4">
+          Class Details
+        </h2>
+
+        <h3 className="text-xl font-medium mb-4 text-center">
+          You are currently in class:{" "}
+          <span className="text-blue-500 font-bold">
+            {sclassDetails?.sclassName || "N/A"}
+          </span>
+        </h3>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-300 text-center">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="py-2 px-4 border-b text-gray-600 font-bold">
+                  Subject Name
+                </th>
+                <th className="py-2 px-4 border-b text-gray-600 font-bold">
+                  Subject Code
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredSubjects && filteredSubjects.length > 0 ? (
+                filteredSubjects.map((subject, index) => (
+                  <tr key={index}>
+                    <td className="py-2 px-4 border-b text-blue-500">
+                      {subject.subName}
+                    </td>
+                    <td className="py-2 px-4 border-b text-blue-500">
+                      {subject.subCode}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2} className="py-2 px-4 border-b text-gray-600">
+                    No subjects available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -152,10 +285,14 @@ const StudentSubjects: React.FC = () => {
               </div>
             </>
           ) : (
-            renderClassDetailsSection()
+            "No mark available"
           )}
         </div>
       )}
+      <>
+        {renderClassDetailsSection()}
+        {renderEnrolledSubjectsTable()}
+      </>
     </>
   );
 };

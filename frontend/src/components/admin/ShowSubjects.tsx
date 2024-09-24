@@ -97,7 +97,7 @@ const ShowSubjects: React.FC = () => {
     {
       icon: <Trash className="text-red-500" size={24} />,
       name: "Delete All Subjects",
-      action: () => deleteHandler(ID, "Subjects"),
+      action: () => deleteHandler(ID, "subjects"),
     },
   ];
 
@@ -107,7 +107,7 @@ const ShowSubjects: React.FC = () => {
         <>
           <ArrowLeft
             onClick={() => navigate(-1)}
-            className="bg-blue-500 text-white mb-8"
+            className="bg-blue-500 text-white mb-8 cursor-pointer"
           />
           <div className="text-center flex justify-center items-center py-4">
             <div className="flex justify-center items-center h-screen">

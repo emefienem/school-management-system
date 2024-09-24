@@ -23,6 +23,7 @@ const AddStudent: React.FC<AddStudentProps> = ({ situation }) => {
   } = useAuth();
 
   const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [rollNum, setRollNum] = useState<number | undefined>(undefined);
   const [password, setPassword] = useState<string>("");
   const [className, setClassName] = useState<string>("");
@@ -64,6 +65,7 @@ const AddStudent: React.FC<AddStudentProps> = ({ situation }) => {
 
   const fields = {
     name,
+    email,
     rollNum,
     password,
     // sclassName,
@@ -124,6 +126,18 @@ const AddStudent: React.FC<AddStudentProps> = ({ situation }) => {
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoComplete="name"
+            required
+          />
+
+          <label className="block mt-4 text-sm font-medium text-gray-700">
+            Email
+          </label>
+          <input
+            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            type="email"
+            placeholder="Enter student's email..."
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             required
           />
 

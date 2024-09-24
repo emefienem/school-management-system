@@ -4,30 +4,33 @@ const prisma = new PrismaClient();
 const complainCtrl = {
   create: async (req, res) => {
     try {
-      const { studentId, teacherId, schoolId, complaint } = req.body;
+      const { studentId, teacherId, parentId, schoolId, complaint } = req.body;
       const date = new Date();
 
-      // Validate input data
-      if ((!studentId && !teacherId) || (studentId && teacherId)) {
+      if (
+        (!studentId && !teacherId && !parentId) ||
+        (studentId && teacherId && parentId)
+      ) {
         return res.status(400).json({
-          message: "Either studentId or teacherId must be set, but not both",
+          message:
+            "Either studentId, teacherId or parentId must be set, but not more than one",
         });
       }
 
       if (
         (!studentId || isNaN(studentId)) &&
-        (!teacherId || isNaN(teacherId))
+        (!teacherId || isNaN(teacherId)) &&
+        (!parentId || isNaN(parentId))
       ) {
         return res
           .status(400)
-          .json({ message: "Invalid student or teacher ID" });
+          .json({ message: "Invalid student, teacher or parent ID" });
       }
 
       if (!schoolId || isNaN(schoolId)) {
         return res.status(400).json({ message: "Invalid school ID" });
       }
 
-      // Check if the user is either a valid student or teacher
       let userExists;
       if (studentId) {
         userExists = await prisma.student.findUnique({
@@ -37,17 +40,21 @@ const complainCtrl = {
         userExists = await prisma.teacher.findUnique({
           where: { id: parseInt(teacherId) },
         });
+      } else if (parentId) {
+        userExists = await prisma.parent.findUnique({
+          where: { id: parseInt(parentId) },
+        });
       }
 
       if (!userExists) {
         return res.status(400).json({ message: "User not found" });
       }
 
-      // Create the complaint
       const complain = await prisma.complain.create({
         data: {
           studentId: studentId ? parseInt(studentId) : null,
           teacherId: teacherId ? parseInt(teacherId) : null,
+          parentId: parentId ? parseInt(parentId) : null,
           schoolId: parseInt(schoolId),
           date,
           complaint,
@@ -59,29 +66,6 @@ const complainCtrl = {
       res.status(500).json({ message: error.message });
     }
   },
-  // create: async (req, res) => {
-  //   try {
-  //     const { userId, schoolId, complaint } = req.body;
-  //     const date = new Date();
-
-  //     if (!userId || isNaN(userId) || !schoolId || isNaN(schoolId)) {
-  //       return res.status(400).json({ message: "Invalid user or school ID" });
-  //     }
-
-  //     const complain = await prisma.complain.create({
-  //       data: {
-  //         userId: parseInt(userId),
-  //         schoolId: parseInt(schoolId),
-  //         date,
-  //         complaint,
-  //       },
-  //     });
-
-  //     res.send(complain);
-  //   } catch (error) {
-  //     res.status(500).json({ message: error.message });
-  //   }
-  // },
 
   list: async (req, res) => {
     try {

@@ -43,12 +43,42 @@ const classCtrl = {
     }
   },
 
+  // getClassDetail: async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const sclass = await prisma.sclass.findUnique({
+  //       where: { id: parseInt(id) },
+  //       include: { school: true },
+  //     });
+
+  //     if (sclass) {
+  //       res.send(sclass);
+  //     } else {
+  //       res.send({ message: "No class found" });
+  //     }
+  //   } catch (err) {
+  //     res.status(500).json(err);
+  //   }
+  // },
+
   getClassDetail: async (req, res) => {
     try {
       const { id } = req.params;
       const sclass = await prisma.sclass.findUnique({
         where: { id: parseInt(id) },
-        include: { school: true },
+        include: {
+          school: {
+            select: {
+              id: true,
+              name: true,
+              schoolName: true,
+              feeStructureId: true,
+              role: true,
+              email: false,
+              password: false,
+            },
+          },
+        },
       });
 
       if (sclass) {
@@ -56,29 +86,47 @@ const classCtrl = {
       } else {
         res.send({ message: "No class found" });
       }
-    } catch (err) {
-      res.status(500).json(err);
+    } catch (error) {
+      res.status(500).json({ messagge: error.message });
     }
   },
 
   getClassStudents: async (req, res) => {
     try {
       const { id } = req.params;
+      const targetSclassId = parseInt(id);
+
       const students = await prisma.student.findMany({
-        where: { sclassId: parseInt(id) },
+        include: {
+          enrollment: {
+            include: {
+              subject: true,
+            },
+          },
+        },
       });
 
-      if (students.length > 0) {
-        const modifiedStudents = students.map((student) => {
-          const { password, ...rest } = student;
-          return rest;
-        });
+      const filteredStudents = students.filter((student) => {
+        const isInStudentClass = student.sclassId === targetSclassId;
+        const isInEnrollmentClass = student.enrollment.some(
+          (enrollment) => enrollment.subject.sclassId === targetSclassId
+        );
+
+        return isInStudentClass || isInEnrollmentClass;
+      });
+
+      const modifiedStudents = filteredStudents.map((student) => {
+        const { password, ...rest } = student;
+        return rest;
+      });
+
+      if (modifiedStudents.length > 0) {
         res.send(modifiedStudents);
       } else {
         res.send({ message: "No students found" });
       }
-    } catch (err) {
-      res.status(500).json(err);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   },
 

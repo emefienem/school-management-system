@@ -133,13 +133,13 @@ const ShowStudents: React.FC = () => {
           <div className="flex">
             <button
               onClick={handleClick}
-              className="bg-black text-white py-1 px-3 rounded-l hover:bg-gray-800"
+              className="bg-orange-500 text-white py-1 px-3 rounded-l hover:bg-gray-800"
             >
               {options[selectedIndex]}
             </button>
             <button
               onClick={handleToggle}
-              className="bg-gray-600 text-white py-1 px-2 rounded-r hover:bg-gray-700"
+              className="bg-orange-600 text-white py-1 px-2 rounded-r hover:bg-gray-700"
             >
               {open ? (
                 <ChevronUp className="h-4 w-4" />
@@ -153,7 +153,7 @@ const ShowStudents: React.FC = () => {
               {options.map((option, index) => (
                 <button
                   key={option}
-                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                  className={`block px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 ${
                     index === selectedIndex ? "bg-gray-200" : ""
                   }`}
                   onClick={() => handleMenuItemClick(index)}
@@ -187,7 +187,7 @@ const ShowStudents: React.FC = () => {
         <>
           <ArrowLeft
             onClick={() => navigate(-1)}
-            className="bg-blue-500 text-white mb-8"
+            className="bg-blue-500 text-white mb-8 cursor-pointer"
           />
           <div className="text-center flex justify-center items-center py-4">
             <div className="flex justify-center items-center h-screen">

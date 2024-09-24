@@ -9,7 +9,7 @@ const {
 const studentCtrl = {
   studentRegister: async (req, res) => {
     try {
-      const { name, password, rollNum, adminID, sclassId } = req.body;
+      const { name, email, password, rollNum, adminID, sclassId } = req.body;
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -29,6 +29,7 @@ const studentCtrl = {
         const student = await prisma.student.create({
           data: {
             name,
+            email,
             rollNum,
             password: hashedPassword,
             sclassId,
@@ -61,10 +62,6 @@ const studentCtrl = {
       const rollNumber = parseInt(rollNum, 10);
       let user = await prisma.student.findFirst({
         where: {
-          // rollNum_name: {
-          //   rollNum: rollNum,
-          //   name: studentName,
-          // },
           rollNum: rollNumber,
           name: studentName,
         },
@@ -150,6 +147,7 @@ const studentCtrl = {
       return res.status(500).json({ message: error.message });
     }
   },
+
   getStudentDetails: async (req, res) => {
     try {
       const { id } = req.params;
@@ -160,10 +158,6 @@ const studentCtrl = {
           school: { select: { schoolName: true } },
           sclass: { select: { sclassName: true } },
           examResults: { include: { subName: { select: { subName: true } } } },
-          // attendance: {
-          //   include: { subName: { select: { subName: true } } },
-          //   select: { sessions: true },
-          // },
           attendance: {
             select: {
               subName: { select: { subName: true } },
@@ -180,18 +174,6 @@ const studentCtrl = {
         },
       });
 
-      // if (student) {
-      //   const { password, ...studentData } = student;
-      //   res.send(studentData);
-      // } else return res.status(404).json({ message: "No student found" });
-
-      // if (student.disabled) {
-      //   return res
-      //     .status(403)
-      //     .json({ message: "Account is disabled due to unpaid fees" });
-      // }
-
-      // res.json(student);
       if (!student) {
         return res.status(404).json({ message: "No student found" });
       }
@@ -212,12 +194,22 @@ const studentCtrl = {
   deleteStudent: async (req, res) => {
     try {
       const { id } = req.params;
+
+      await prisma.attendance.deleteMany({
+        where: { studentId: Number(id) },
+      });
+
+      await prisma.examResult.deleteMany({
+        where: { studentId: Number(id) },
+      });
+
       const result = await prisma.student.delete({
         where: { id: Number(id) },
       });
+
       res.send(result);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 
@@ -280,40 +272,46 @@ const studentCtrl = {
       const { subName, marksObtained } = req.body;
       const student = await prisma.student.findUnique({
         where: { id: Number(id) },
-        include: { examResult: true },
+        include: { examResults: true },
       });
 
       if (!student) {
         return res.send({ message: "Student not found" });
       }
 
-      const existingResult = student.examResult.find(
+      const existingResult = student.examResults.find(
         (result) => result.subNameId === Number(subName)
       );
+
+      const marks = Number(marksObtained);
+
+      if (isNaN(marks)) {
+        return res.status(400).send({ message: "Invalid marks value" });
+      }
 
       if (existingResult) {
         await prisma.examResult.update({
           where: { id: existingResult.id },
-          data: { marksObtained },
+          data: { marksObtained: marks },
         });
       } else {
         await prisma.examResult.create({
           data: {
             studentId: student.id,
             subNameId: Number(subName),
-            marksObtained,
+            marksObtained: marks,
           },
         });
       }
 
       const updatedStudent = await prisma.student.findUnique({
         where: { id: student.id },
-        include: { examResult: true },
+        include: { examResults: true },
       });
 
       res.send(updatedStudent);
     } catch (error) {
-      res.status(500).json(error);
+      res.status(500).json({ message: error.message });
     }
   },
 
@@ -458,6 +456,107 @@ const studentCtrl = {
       });
     } catch (error) {
       res.status(500).json(error);
+    }
+  },
+
+  enrollSubject: async (req, res) => {
+    try {
+      const { studentId, subjectId } = req.body;
+
+      const existingEnrollment = await prisma.enrollment.findFirst({
+        where: { studentId, subjectId },
+      });
+
+      if (existingEnrollment) {
+        return res
+          .status(400)
+          .json({ message: "Student is already enrolled in this subject" });
+      }
+
+      const newEnrollment = await prisma.enrollment.create({
+        data: {
+          studentId,
+          subjectId,
+        },
+      });
+
+      res.status(201).json(newEnrollment);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  dropSubject: async (req, res) => {
+    try {
+      const { studentId, subjectId } = req.body;
+
+      const enrollment = await prisma.enrollment.findFirst({
+        where: { studentId, subjectId },
+      });
+
+      if (!enrollment) {
+        return res
+          .status(404)
+          .json({ message: "Student is not enrolled in this subject" });
+      }
+
+      await prisma.enrollment.delete({
+        where: { id: enrollment.id },
+      });
+
+      res.status(200).json({ message: "Subject dropped successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getAvailableSubjects: async (req, res) => {
+    try {
+      const { studentId } = req.body;
+
+      const student = await prisma.student.findUnique({
+        where: { id: studentId },
+        select: { sclassId: true },
+      });
+
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      const studentClassId = student.sclassId;
+
+      const availableSubjects = await prisma.subject.findMany({
+        where: {
+          sclassId: { not: studentClassId },
+        },
+        include: { sclass: true },
+      });
+
+      if (availableSubjects.length > 0) {
+        res.status(200).json(availableSubjects);
+      } else {
+        res.status(200).json({ message: "No available subjects found" });
+      }
+    } catch (error) {
+      console.error("Error fetching available subjects:", error);
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  },
+
+  getEnrolledSubjects: async (req, res) => {
+    try {
+      const { studentId } = req.body;
+
+      const enrolledSubjects = await prisma.enrollment.findMany({
+        where: { studentId: parseInt(studentId) },
+        include: { subject: true },
+      });
+
+      res.status(200).json(enrolledSubjects);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 };

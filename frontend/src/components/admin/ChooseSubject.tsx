@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Loader } from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 import { useAuth } from "@/api/useAuth";
 
 interface ChooseSubjectProps {
@@ -67,70 +67,73 @@ const ChooseSubject: React.FC<ChooseSubjectProps> = ({ situation }) => {
       </div>
     );
   }
-  // else if (error) {
-  //   console.error(error);
-  //   return <div className="text-center text-red-500">An error occurred.</div>;
-  // }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h2 className="text-lg font-semibold mb-4">Choose a Subject</h2>
-      <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700 text-left">
-              <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Subject Name</th>
-              <th className="px-4 py-2">Subject Code</th>
-              <th className="px-4 py-2 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(subjectsList) && subjectsList.length > 0 ? (
-              subjectsList.map((subject, index) => (
-                <tr key={subject._id} className="border-b">
-                  <td className="px-4 py-2">{index + 1}</td>
-                  <td className="px-4 py-2">{subject.subName}</td>
-                  <td className="px-4 py-2">{subject.subCode}</td>
-                  <td className="px-4 py-2 text-center">
-                    {situation === "Norm" ? (
-                      <button
-                        className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-                        onClick={() =>
-                          navigate(`/admin/teachers/addteacher/${subject.id}`)
-                        }
-                      >
-                        Choose
-                      </button>
-                    ) : (
-                      <button
-                        className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 disabled:bg-gray-400"
-                        disabled={loader}
-                        onClick={() =>
-                          updateSubjectHandler(teacherID, subject.id)
-                        }
-                      >
-                        {loader ? (
-                          <Loader className="animate-spin w-5 h-5 mx-auto" />
-                        ) : (
-                          "Choose Sub"
-                        )}
-                      </button>
-                    )}
+    <>
+      <ArrowLeft
+        onClick={() => navigate(-1)}
+        className="bg-blue-500 text-white mb-8"
+      />
+
+      <div className="max-w-4xl mx-auto p-4">
+        <h2 className="text-lg font-semibold mb-4">Choose a Subject</h2>
+        <div className="overflow-x-auto shadow-md rounded-lg">
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700 text-left">
+                <th className="px-4 py-2">#</th>
+                <th className="px-4 py-2">Subject Name</th>
+                <th className="px-4 py-2">Subject Code</th>
+                <th className="px-4 py-2 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(subjectsList) && subjectsList.length > 0 ? (
+                subjectsList.map((subject, index) => (
+                  <tr key={subject._id} className="border-b">
+                    <td className="px-4 py-2">{index + 1}</td>
+                    <td className="px-4 py-2">{subject.subName}</td>
+                    <td className="px-4 py-2">{subject.subCode}</td>
+                    <td className="px-4 py-2 text-center">
+                      {situation === "Norm" ? (
+                        <button
+                          className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+                          onClick={() =>
+                            navigate(`/admin/teachers/addteacher/${subject.id}`)
+                          }
+                        >
+                          Choose
+                        </button>
+                      ) : (
+                        <button
+                          className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 disabled:bg-gray-400"
+                          disabled={loader}
+                          onClick={() =>
+                            updateSubjectHandler(teacherID, subject.id)
+                          }
+                        >
+                          {loader ? (
+                            <Loader className="animate-spin w-5 h-5 mx-auto" />
+                          ) : (
+                            "Choose Sub"
+                          )}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="text-center py-4 text-gray-500">
+                    No subjects available.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="text-center py-4 text-gray-500">
-                  No subjects available.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
