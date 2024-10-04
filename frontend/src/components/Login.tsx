@@ -29,7 +29,7 @@ export const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    toast.loading("Trying to login...", { duration: 4000 });
+    const toastId = toast.loading("Trying to login...");
     try {
       await login(fields, role);
       if (role === "student") {
@@ -46,6 +46,9 @@ export const Login = () => {
       }
     } catch (error: any) {
       toast.error(error || "An error occurred.", { duration: 4000 });
+      // console.log(error);
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 
@@ -133,7 +136,7 @@ export const Login = () => {
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-8 cursor-pointer text-sm text-gray-600 hover:text-gray-900  text-[0.65rem]"
+              className="absolute right-3 top-10 cursor-pointer text-sm text-gray-600 hover:text-gray-900  text-[0.65rem]"
             >
               {showPassword ? (
                 <EyeOffIcon className="size-6" />
@@ -164,13 +167,13 @@ export const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 px-4 text-white font-semibold rounded-md shadow bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full py-2 px-4 text-white font-semibold rounded-md shadow bg-orange-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             Login
           </button>
           <div className="flex items-center gap-x-1 text-[13px] justify-center">
             <p>Don't Have an Account?</p>
-            <Link className="text-blue-500" to={"/sign"}>
+            <Link className="text-orange-500" to={"/signup"}>
               Create Account
             </Link>
           </div>

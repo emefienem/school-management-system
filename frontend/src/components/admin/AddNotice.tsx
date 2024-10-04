@@ -31,13 +31,13 @@ const AddNotice: React.FC = () => {
   const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoader(true);
-    const Id = toast.loading("Sending notice....");
+    const toastId = toast.loading("Sending notice....");
     try {
       addStuff(fields, address);
     } catch (error: any) {
       toast.error(error || "An error occurred");
     } finally {
-      toast.dismiss(Id);
+      toast.dismiss(toastId);
     }
   };
 

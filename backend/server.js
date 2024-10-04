@@ -33,6 +33,8 @@ app.use("/notice", require("./routers/noticeRoute"));
 app.use("/auth", require("./routers/authRoute"));
 
 app.use("/fee", require("./routers/feeRoute"));
+app.use("/assignment", require("./routers/assignmentRoute"));
+app.use("/test", require("./routers/testRoute"));
 
 async function main() {
   try {

@@ -43,6 +43,11 @@ import ViewChildren from "./components/parent/ViewChildren";
 import PayFee from "./components/parent/PayFee";
 import SetFee from "./components/admin/SetFee";
 import Enroll from "./components/student/Enroll";
+import Assignment from "./components/teacher/Assignment";
+import StudentAssignment from "./components/student/StudentAssignment";
+import TakeQuiz from "./components/student/TakeQuiz";
+import VideoPage from "./components/VideoPage";
+import HomeVideo from "./components/HomeVideo";
 
 const App = () => {
   return (
@@ -322,6 +327,22 @@ const App = () => {
             }
           />
           <Route
+            path="/room"
+            element={
+              <ProtectedRoute roles={["teacher", "Student"]}>
+                <HomeVideo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/room/:id"
+            element={
+              <ProtectedRoute roles={["teacher", "Student"]}>
+                <VideoPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/student/enroll"
             element={
               <ProtectedRoute roles={["Student"]}>
@@ -350,6 +371,22 @@ const App = () => {
             element={
               <ProtectedRoute roles={["Student"]}>
                 <StudentComplain />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/assignment-test"
+            element={
+              <ProtectedRoute roles={["Student"]}>
+                <StudentAssignment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assignment-test"
+            element={
+              <ProtectedRoute roles={["teacher"]}>
+                <Assignment />
               </ProtectedRoute>
             }
           />

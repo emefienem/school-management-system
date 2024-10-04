@@ -5,6 +5,14 @@ import { useAuth } from "@/api/useAuth";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
+interface Score {
+  id: string;
+  assignment: {
+    title: string;
+  };
+  score: number;
+}
+
 const StudentSubjects: React.FC = () => {
   const navigate = useNavigate();
   const {
@@ -22,6 +30,8 @@ const StudentSubjects: React.FC = () => {
     getEnrolledSubjects,
     enrolledSubjects,
     getAvailableSubjects,
+    getScores,
+    scores,
   } = useAuth();
   const classID = currentUser?.user?.sclassId;
   const subjectID = currentUser?.user?.schoolId;
@@ -34,6 +44,7 @@ const StudentSubjects: React.FC = () => {
     getUserDetails(ID, "student");
     getSubjectList(subjectID, "subject");
     getEnrolledSubjects(studentId);
+    getScores(ID);
   }, [ID]);
 
   if (getresponse) {
@@ -58,6 +69,47 @@ const StudentSubjects: React.FC = () => {
 
   const handleSectionChange = (newSection: "table" | "chart") => {
     setSelectedSection(newSection);
+  };
+
+  const renderAssignmentDetails = () => {
+    return (
+      <div className="overflow-x-auto pb-20">
+        <h2 className="text-2xl font-semibold text-center my-4">
+          Your Assignment
+        </h2>
+        <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-3 border-b text-left text-gray-700 font-bold">
+                Assignment Title
+              </th>
+              <th className="px-6 py-3 border-b text-left text-gray-700 font-bold">
+                Assignment Score
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {scores.length > 0 ? (
+              scores.map((score: Score, index) => (
+                <tr
+                  key={index}
+                  className="border-t hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 border-b text-gray-800 ">
+                    {score.assignment.title}
+                  </td>
+                  <td className="px-6 py-4 border-b text-gray-800 ">
+                    {score.score}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <p className="text-gray-500">No scores available yet.</p>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
   };
 
   const renderEnrolledSubjectsTable = () => {
@@ -292,6 +344,7 @@ const StudentSubjects: React.FC = () => {
       <>
         {renderClassDetailsSection()}
         {renderEnrolledSubjectsTable()}
+        {renderAssignmentDetails()}
       </>
     </>
   );

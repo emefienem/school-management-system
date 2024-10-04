@@ -96,12 +96,6 @@ const Sidebar = () => {
             Icon={ClipboardIcon}
             allowedRoles={["Admin"]}
           />
-          {/* <SidebarItem
-            to="/admin/set-fee"
-            title="Set Fee"
-            Icon={ClipboardIcon}
-            allowedRoles={["Admin"]}
-          /> */}
           <SidebarItem
             to="/admin/notices"
             title="Notices"
@@ -120,6 +114,19 @@ const Sidebar = () => {
             Icon={ClipboardIcon}
             allowedRoles={["teacher"]}
           />
+
+          <SidebarItem
+            to="/assignment-test"
+            title="C.A"
+            Icon={ClipboardIcon}
+            allowedRoles={["teacher"]}
+          />
+          <SidebarItem
+            to="/room"
+            title="Online class"
+            Icon={ClipboardIcon}
+            allowedRoles={["teacher", "Student"]}
+          />
           <SidebarItem
             to="/teacher/complain"
             title="Complain"
@@ -127,14 +134,20 @@ const Sidebar = () => {
             allowedRoles={["teacher"]}
           />
           <SidebarItem
-            to="/student/enroll"
-            title="Enroll"
+            to="/student/subjects"
+            title="Subjects"
             Icon={ClipboardIcon}
             allowedRoles={["Student"]}
           />
           <SidebarItem
-            to="/student/subjects"
-            title="Subjects"
+            to="/student/enroll"
+            title="Enroll Subject"
+            Icon={ClipboardIcon}
+            allowedRoles={["Student"]}
+          />
+          <SidebarItem
+            to="/student/assignment-test"
+            title="C.A"
             Icon={ClipboardIcon}
             allowedRoles={["Student"]}
           />
@@ -240,10 +253,28 @@ const Sidebar = () => {
               allowedRoles={["teacher"]}
             />
             <SidebarItem
+              to="/room"
+              title="Online class"
+              Icon={ClipboardIcon}
+              allowedRoles={["teacher", "Student"]}
+            />
+            <SidebarItem
+              to="/assignment-test"
+              title="C.A"
+              Icon={ClipboardIcon}
+              allowedRoles={["teacher"]}
+            />
+            <SidebarItem
               to="/teacher/complain"
               title="Complain"
               Icon={MessageCircle}
               allowedRoles={["teacher"]}
+            />
+            <SidebarItem
+              to="/student/subjects"
+              title="Subjects"
+              Icon={ClipboardIcon}
+              allowedRoles={["Student"]}
             />
             <SidebarItem
               to="/student/enroll"
@@ -252,8 +283,8 @@ const Sidebar = () => {
               allowedRoles={["Student"]}
             />
             <SidebarItem
-              to="/student/subjects"
-              title="Subjects"
+              to="/student/assignment-test"
+              title="C.A"
               Icon={ClipboardIcon}
               allowedRoles={["Student"]}
             />

@@ -59,56 +59,6 @@ const TeacherDetails: React.FC = () => {
           </div>
         </>
       ) : (
-        // <div className="container mx-auto p-6">
-        //   <h1 className="text-3xl font-semibold mb-4 uppercase tracking-tight text-blue-500">
-        //     Teacher Details
-        //   </h1>
-        //   <div className="text-center">
-        //     <div className="mb-4">
-        //       <h2 className="text-xl font-semibold mb-2 uppercase">
-        //         Teacher Name:{" "}
-        //         <span className="text-blue-500 font-bold">
-        //           {teacherDetails?.name}
-        //         </span>
-        //       </h2>
-        //     </div>
-        //     <div className="mb-4">
-        //       <h2 className="text-xl font-semibold mb-2 uppercase">
-        //         Class Name:{" "}
-        //         <span className="text-blue-500 font-bold">
-        //           {teacherDetails?.teachSclass?.sclassName}
-        //         </span>
-        //       </h2>
-        //     </div>
-        //     {isSubjectNamePresent ? (
-        //       <>
-        //         <div className="mb-4">
-        //           <h2 className="text-xl font-semibold mb-2 uppercase">
-        //             Subject Name:{" "}
-        //             <span className="text-blue-500 font-bold">
-        //               {teacherDetails?.teachSubject?.subName}
-        //             </span>
-        //           </h2>
-        //         </div>
-        //         <div className="mb-4">
-        //           <h2 className="text-xl font-semibold mb-2 uppercase">
-        //             Subject Sessions:{" "}
-        //             <span className="text-blue-500 font-bold">
-        //               {teacherDetails?.teachSubject?.sessions}
-        //             </span>
-        //           </h2>
-        //         </div>
-        //       </>
-        //     ) : (
-        //       <button
-        //         className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        //         onClick={handleAddSubject}
-        //       >
-        //         Add Subject
-        //       </button>
-        //     )}
-        //   </div>
-        // </div>
         <div className="container mx-auto p-6">
           <h1 className="text-3xl font-semibold mb-4 uppercase tracking-tight text-blue-500">
             Teacher Details

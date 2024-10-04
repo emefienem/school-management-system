@@ -41,6 +41,8 @@ const Dashboard = () => {
     getresponse,
     getEnrolledSubjects,
     enrolledSubjects,
+    getStudentAssignment,
+    assignments,
   } = useAuth();
 
   const ID =
@@ -73,6 +75,7 @@ const Dashboard = () => {
       getUserDetails(currentUser?.user?.id, "student");
       getSubjectList(classID, "subject");
       getEnrolledSubjects(currentUser?.user?.id);
+      getStudentAssignment(currentUser?.user?.id);
     }
   }, [currentUser?.user?.id, classID]);
 
@@ -93,11 +96,12 @@ const Dashboard = () => {
   const filteredSubjects = subjectsList.filter(
     (subject) => subject?.sclassId === userDetails?.sclassId
   );
-
   const numberOfSubject =
     filteredSubjects.length > 0 ? filteredSubjects.length : 0;
 
   const numberOfSubjects = numberOfSubject + enrolledSubjects.length;
+  const numberOfAssignment = assignments.length;
+
   const overallAttendancePercentage =
     calculateOverallAttendancePercentage(subjectAttendance);
   const overallAbsentPercentage = 100 - overallAttendancePercentage;
@@ -192,7 +196,7 @@ const Dashboard = () => {
           <Card
             icon={<Book size={32} />}
             title="Total Assignment"
-            count={0}
+            count={numberOfAssignment}
             duration={4}
           />
         </AuthorizedComponent>

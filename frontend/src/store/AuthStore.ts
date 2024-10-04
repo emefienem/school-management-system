@@ -31,6 +31,14 @@ interface AuthState {
   fee: any[];
   availableSubjects: any[];
   enrolledSubjects: any[];
+  assignments: any[];
+  scores: any[];
+  submissions: any[];
+  quizzes: any[];
+  questions: any[];
+  totalQuestions: any[];
+  quiz: { [key: string]: any };
+  optionQuiz: any[];
   authRequest: () => void;
   authSuccess: (user: any) => void;
   authFailed: (error: string) => void;
@@ -96,6 +104,36 @@ interface AuthState {
   ) => Promise<void>;
   verifyResetCode: (email: string, code: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
+  getStudentAssignment: (id: string) => Promise<void>;
+  getAssignments: (id: string) => Promise<void>;
+  createAssignment: (fields: any) => Promise<void>;
+  submitAnswers: (
+    id: string,
+    assignmentId: string,
+    content: any
+  ) => Promise<void>;
+  gradeAssignment: (score: number, id: string) => Promise<void>;
+  getScores: (id: string) => Promise<void>;
+  getStudentSubmissions: (id: string) => Promise<void>;
+  deleteAss: (assignmentId: string) => Promise<void>;
+  getAllQuizzes: () => Promise<void>;
+  createQuiz: (quizData: any) => Promise<void>;
+  getQuizQuestion: (
+    quizId: string,
+    page: number,
+    pageSize: number
+  ) => Promise<void>;
+  // getQuestionsByQuizId: (quizId: string) => Promise<void>;
+  assignPoints: (data: any) => Promise<void>;
+  updateQuiz: (id: string, fields: any) => Promise<void>;
+  // getOneQuiz: (id: string) => Promise<void>;
+  getOptionsByQuestionId: (id: string) => Promise<void>;
+  submitQuiz: (
+    quizId: string,
+    answers: any,
+    studentId: string
+  ) => Promise<void>;
+  deleteQuiz: (id: number) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -128,6 +166,14 @@ export const useAuthStore = create<AuthState>()(
       fee: [],
       availableSubjects: [],
       enrolledSubjects: [],
+      assignments: [],
+      scores: [],
+      submissions: [],
+      quizzes: [],
+      questions: [],
+      totalQuestions: [],
+      quiz: {},
+      optionQuiz: [],
       authRequest: () => set({ status: "loading" }),
       authSuccess: (user) => {
         set({
@@ -255,6 +301,8 @@ export const useAuthStore = create<AuthState>()(
           subjectDetails: [],
           subjectsList: [],
           teacherDetails: [],
+          quizzes: [],
+          quiz: {},
         });
         // queryClient.clear();
 
@@ -345,6 +393,7 @@ export const useAuthStore = create<AuthState>()(
           set({ error: error.message || "Unknown error", loading: false });
         }
       },
+
       addStuff: async (fields, address) => {
         set({ status: "loading" });
         try {
@@ -832,6 +881,278 @@ export const useAuthStore = create<AuthState>()(
         try {
           await axios.post(`${apiUrl}/auth/forgot-password`, { email });
           set({ response: "Forgot password email sent", loading: false });
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getStudentAssignment: async (studentId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(
+            `${apiUrl}/assignment/students-list`,
+            { studentId }
+          );
+          if (result.data.message) {
+          } else {
+            set({ assignments: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getAssignments: async (teacherId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/assignment/list`, {
+            teacherId,
+          });
+          if (result.data.message) {
+          } else {
+            set({ assignments: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getScores: async (id) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(
+            `${apiUrl}/assignment/students/scores`,
+            { id }
+          );
+          if (result.data.message) {
+          } else {
+            set({ scores: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      submitAnswers: async (studentId, assignmentId, content) => {
+        set({ status: "loading" });
+        try {
+          const result = await axios.post(`${apiUrl}/assignment/submit`, {
+            studentId,
+            assignmentId,
+            content,
+          });
+          if (result.data.message) {
+            set({ status: "failed", response: result.data.message });
+          } else {
+            set({ status: "added", tempDetails: result.data });
+          }
+        } catch (error: any) {
+          set({ status: "error", error: error.message || "Unknown error" });
+        }
+      },
+
+      createAssignment: async (fields) => {
+        set({ status: "loading" });
+        try {
+          const result = await axios.post(
+            `${apiUrl}/assignment/create`,
+            fields
+          );
+          if (result.data.message) {
+            set({ status: "failed", response: result.data.message });
+          } else {
+            set({ status: "added", tempDetails: result.data });
+          }
+        } catch (error: any) {
+          set({ status: "error", error: error.message || "Unknown error" });
+        }
+      },
+
+      gradeAssignment: async (score, id) => {
+        set({ status: "loading" });
+        try {
+          const result = await axios.post(`${apiUrl}/assignment/grade`, {
+            score,
+            id,
+          });
+          if (result.data.message) {
+            set({ status: "failed", response: result.data.message });
+          } else {
+            set({ status: "added", tempDetails: result.data });
+          }
+        } catch (error: any) {
+          set({ status: "error", error: error.message || "Unknown error" });
+        }
+      },
+
+      getStudentSubmissions: async (id) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(
+            `${apiUrl}/assignment/submissions/${id}`
+          );
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({ submissions: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      deleteAss: async (assignmentId) => {
+        set({ loading: true });
+        try {
+          console.log("Deleting assignment with ID:", assignmentId);
+          const result = await axios.delete(
+            `${apiUrl}/assignment/delete/${assignmentId}`
+          );
+
+          set({ loading: false });
+
+          return result.data;
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getAllQuizzes: async () => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(`${apiUrl}/test/quiz`);
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({ quizzes: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+      createQuiz: async (quizData) => {
+        set({ loading: true });
+        try {
+          await axios.post(`${apiUrl}/test/createQuiz`, quizData);
+          set({ response: "Created successfully", loading: false });
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getQuizQuestion: async (quizId, page = 1, pageSize = 2) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(
+            `${apiUrl}/test/quiz/${quizId}?page=${page}&pageSize=${pageSize}`
+          );
+
+          {
+            console.log(result.data);
+          }
+          if (result.data.message) {
+            set({ response: result.data.message, loading: false });
+          } else {
+            set({ quiz: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({
+            error: error.message || "Failed to fetch questions",
+            loading: false,
+          });
+        }
+      },
+      // getQuestionsByQuizId: async (quizId) => {
+      //   set({ loading: true });
+      //   try {
+      //     const result = await axios.get(`${apiUrl}/test/quiz/${quizId}`);
+      //     if (result.data.message) {
+      //       set({ response: result.data.message, loading: false });
+      //     } else {
+      //       set({ questions: result.data, loading: false });
+      //     }
+      //   } catch (error: any) {
+      //     set({
+      //       error: error.message || "Failed to fetch questions",
+      //       loading: false,
+      //     });
+      //   }
+      // },
+      assignPoints: async (data) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/test/assignPoint`, data);
+          set({ response: result.data, loading: false });
+        } catch (error: any) {
+          set({
+            error: error.message || "Failed to assign points",
+            loading: false,
+          });
+        }
+      },
+
+      updateQuiz: async (id, fields) => {
+        set({ loading: true });
+        try {
+          const result = await axios.put(
+            `${apiUrl}/test/updateQuiz/${id}`,
+            fields
+          );
+          set({ loading: false, response: result.data.message });
+        } catch (error: any) {
+          set({ loading: false, error: error.message || "Unknown error" });
+        }
+      },
+
+      // getOneQuiz: async (id) => {
+      //   set({ loading: true });
+      //   try {
+      //     const result = await axios.get(`${apiUrl}/test/quiz/${id}`);
+      //     set({ loading: false, quiz: result.data });
+      //   } catch (error: any) {
+      //     set({ loading: false, error: error.message || "Unknown error" });
+      //   }
+      // },
+
+      getOptionsByQuestionId: async (id) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(`${apiUrl}/test/options/${id}`);
+          set({ loading: false, optionQuiz: result.data });
+        } catch (error: any) {
+          set({ loading: false, error: error.message || "Unknown error" });
+        }
+      },
+
+      submitQuiz: async (quizId, answers, studentId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/test/submitQuiz`, {
+            quizId,
+            answers,
+            studentId,
+          });
+
+          set({ response: result.data, loading: false });
+        } catch (error: any) {
+          set({
+            error: error.message || "Failed to submit quiz",
+            loading: false,
+          });
+        }
+      },
+
+      deleteQuiz: async (id) => {
+        set({ loading: true });
+        try {
+          const result = await axios.delete(`${apiUrl}/test/delete/${id}`);
+
+          set((state) => ({
+            quizzes: state.quizzes.filter((quiz) => quiz.id !== id),
+            loading: false,
+          }));
+
+          return result.data;
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
         }

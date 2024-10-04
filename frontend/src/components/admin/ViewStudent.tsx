@@ -160,96 +160,7 @@ const ViewStudent: React.FC = () => {
       return (
         <div>
           <h3 className="text-lg font-semibold mb-4">Attendance:</h3>
-          {/* <table className="min-w-full bg-white">
-            <thead>
-              <tr className="w-full bg-gray-200">
-                <th className="py-2">Subject</th>
-                <th className="py-2">Present</th>
-                <th className="py-2">Total Sessions</th>
-                <th className="py-2">Attendance Percentage</th>
-                <th className="py-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            {Object.entries(groupAttendanceBySubject(subjectAttendance)).map(
-              ([subName, { present, allData, subId, sessions }], index) => {
-                const subjectAttendancePercentage =
-                  calculateSubjectAttendancePercentage(present, sessions);
-                return (
-                  <tbody key={index}>
-                    <tr className="bg-gray-100">
-                      <td className="py-2">{subName}</td>
-                      <td className="py-2">{present}</td>
-                      <td className="py-2">{sessions}</td>
-                      <td className="py-2">{subjectAttendancePercentage}%</td>
-                      <td className="py-2 text-center">
-                        <button
-                          className="text-blue-600 hover:text-blue-900"
-                          onClick={() => handleOpen(subId)}
-                        >
-                          {openStates[subId] ? <ChevronUp /> : <ChevronDown />}{" "}
-                          Details
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-900 ml-2"
-                          onClick={() => removeSubAttendance(subId)}
-                        >
-                          <Trash />
-                        </button>
-                        <button
-                          className="text-green-600 hover:text-green-900 ml-2"
-                          onClick={() =>
-                            navigate(
-                              `/admin/subject/student/attendance/${studentID}/${subId}`
-                            )
-                          }
-                        >
-                          Change
-                        </button>
-                      </td>
-                    </tr>
-                    {openStates[subId] && (
-                      <tr>
-                        <td colSpan={5} className="py-2">
-                          <div className="p-4 bg-gray-100">
-                            <h4 className="text-sm font-semibold mb-2">
-                              Attendance Details
-                            </h4>
-                            <table className="min-w-full bg-white">
-                              <thead>
-                                <tr className="w-full bg-gray-200">
-                                  <th className="py-2">Date</th>
-                                  <th className="py-2 text-right">Status</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {allData.map(
-                                  (data: DataType, index: number) => {
-                                    const date = new Date(data.date);
-                                    const dateString =
-                                      date.toString() !== "Invalid Date"
-                                        ? date.toISOString().substring(0, 10)
-                                        : "Invalid Date";
-                                    return (
-                                      <tr key={index} className="bg-gray-100">
-                                        <td className="py-2">{dateString}</td>
-                                        <td className="py-2 text-right">
-                                          {data.status}
-                                        </td>
-                                      </tr>
-                                    );
-                                  }
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                );
-              }
-            )}
-          </table> */}
+
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
             <thead>
               <tr className="bg-gray-200">
@@ -512,30 +423,6 @@ const ViewStudent: React.FC = () => {
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Subject Marks:</h3>
         {subjectMarks ? (
-          // <table className="min-w-full bg-white">
-          //   <thead>
-          //     <tr className="bg-gray-200">
-          //       <th className="py-2">Subject</th>
-          //       <th className="py-2">Marks</th>
-          //     </tr>
-          //   </thead>
-          //   <tbody>
-          //     {userDetails.examResults.map(
-          //       (
-          //         result: {
-          //           subName: { subName: string };
-          //           marksObtained: number;
-          //         },
-          //         index: number
-          //       ) => (
-          //         <tr key={index}>
-          //           <td>{result.subName?.subName || "N/A"}</td>
-          //           <td>{result.marksObtained || "N/A"}</td>
-          //         </tr>
-          //       )
-          //     )}
-          //   </tbody>
-          // </table>
           <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
             <thead>
               <tr className="bg-gray-200 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
@@ -571,6 +458,57 @@ const ViewStudent: React.FC = () => {
           </table>
         ) : (
           <p>No subject marks available.</p>
+        )}
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Assignment Marks
+        </h3>
+        {userDetails && userDetails?.answer?.length > 0 ? (
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 border-b text-left text-gray-700">
+                  Title
+                </th>
+                <th className="px-4 py-2 border-b text-left text-gray-700">
+                  Marks
+                </th>
+                <th className="px-4 py-2 border-b text-left text-gray-700">
+                  Submission Date and Time
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {userDetails?.answer?.map(
+                (
+                  result: {
+                    assignment: { title: string };
+                    score: number;
+                    submittedAt: string;
+                  },
+                  index: number
+                ) => {
+                  return (
+                    <tr key={index} className="border-t">
+                      <td className="px-4 py-2 border-b text-gray-800">
+                        {result?.assignment?.title}
+                      </td>
+                      <td className="px-4 py-2 border-b text-gray-600">
+                        {result?.score}
+                      </td>
+                      <td className="px-4 py-2 border-b text-gray-600">
+                        {result?.submittedAt}
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-500">No assignment data available</p>
         )}
       </div>
 

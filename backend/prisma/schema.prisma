@@ -45,6 +45,7 @@ model Teacher {
   teachSclassId  Int?
   attendance     Attendance[]
   complains      Complain[]
+  asssignment    Assignment[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }
@@ -78,6 +79,7 @@ model Subject {
   examResults ExamResult[]
   attendances Attendance[]
   enrollment  Enrollment[]
+  assignment  Assignment[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -113,6 +115,10 @@ model Student {
   disabled    Boolean      @default(false)
   complains   Complain[]
   enrollment  Enrollment[]
+  answer      Answer[]
+  level       Int          @default(1)
+  quiz        Quiz[]
+  points      Points[]
 }
 
 model Enrollment {
@@ -210,4 +216,67 @@ model PasswordReset {
   email     String
   code      String
   expiresAt DateTime
+}
+
+model Assignment {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dueDate     DateTime
+  subjectId   Int
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  teacherId   Int
+  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  answers     Answer[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Answer {
+  id           Int        @id @default(autoincrement())
+  content      String
+  submittedAt  DateTime   @default(now())
+  score        Int?
+  studentId    Int
+  student      Student    @relation(fields: [studentId], references: [id])
+  assignmentId Int
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+}
+
+model Option {
+  id         Int       @id @default(autoincrement())
+  option     String
+  isCorrect  Boolean   @default(false)
+  questionId Int?
+  questions  Question? @relation(fields: [questionId], references: [id])
+}
+
+model Points {
+  id        Int     @id @default(autoincrement())
+  point     Int
+  studentId Int
+  quizId    Int
+  student   Student @relation(fields: [studentId], references: [id])
+  Quiz      Quiz    @relation(fields: [quizId], references: [id])
+}
+
+model Question {
+  id       Int      @id @default(autoincrement())
+  question String
+  points   Int
+  quizId   Int
+  options  Option[]
+  Quiz     Quiz     @relation(fields: [quizId], references: [id])
+}
+
+model Quiz {
+  id          Int        @id @default(autoincrement())
+  title       String
+  MinPoints   Int
+  description String     @db.VarChar(500)
+  time        Int
+  studentId   Int?
+  student     Student?   @relation(fields: [studentId], references: [id])
+  questions   Question[]
+  points      Points[]
 }

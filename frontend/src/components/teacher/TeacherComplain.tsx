@@ -34,12 +34,13 @@ const TeacherComplain = () => {
       setLoader(false);
       setShowPopup(true);
       setMessage("Done Successfully");
-    } else if (error) {
-      setLoader(false);
-      setShowPopup(true);
-      setMessage("Network Error");
     }
-  }, [getstatus, error]);
+    // else if (error) {
+    //   setLoader(false);
+    //   setShowPopup(true);
+    //   setMessage("Network Error");
+    // }
+  }, [getstatus]);
 
   return (
     <>

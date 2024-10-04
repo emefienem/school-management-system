@@ -4,6 +4,7 @@ import { useAuth } from "@/api/useAuth";
 import { Loader } from "lucide-react";
 import Popup from "./function/Popup";
 import { Navigate } from "react-router";
+
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [code, setCode] = useState<string>("");

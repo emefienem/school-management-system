@@ -17,17 +17,22 @@ const Enroll: React.FC = () => {
   const studentId = currentUser?.user?.id;
 
   const handleEnroll = async (subjectId: string) => {
+    const toastId = toast.loading(
+      `Enrolling in subject:  ${availableSubjects.map(
+        (subject) => subject.name
+      )}`
+    );
     try {
       await enrollSubject(studentId, subjectId);
       toast.success(
         `Successfully enrolled in subject: ${availableSubjects.map(
           (subject) => subject.name
-        )}`,
-        { duration: 4000 }
+        )}`
       );
-      console.log(`Successfully enrolled in subject ID: ${subjectId}`);
     } catch (error: any) {
       toast.error(error.message, { duration: 4000 });
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 

@@ -234,7 +234,7 @@ const ViewChildren: React.FC = () => {
           </table>
 
           <h5 style={{ fontSize: "1.5rem", marginBottom: "10px" }}>
-            Exam Results
+            Child Exam Results
           </h5>
           <table
             style={{
@@ -287,6 +287,57 @@ const ViewChildren: React.FC = () => {
           </table>
         </div>
       ))}
+
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Child Assignment Marks
+        </h3>
+        {userDetails && userDetails?.answer?.length > 0 ? (
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 border-b text-left text-gray-700">
+                  Title
+                </th>
+                <th className="px-4 py-2 border-b text-left text-gray-700">
+                  Marks
+                </th>
+                <th className="px-4 py-2 border-b text-left text-gray-700">
+                  Submission Date and Time
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {userDetails?.answer?.map(
+                (
+                  result: {
+                    assignment: { title: string };
+                    score: number;
+                    submittedAt: string;
+                  },
+                  index: number
+                ) => {
+                  return (
+                    <tr key={index} className="border-t">
+                      <td className="px-4 py-2 border-b text-gray-800">
+                        {result?.assignment?.title}
+                      </td>
+                      <td className="px-4 py-2 border-b text-gray-600">
+                        {result?.score}
+                      </td>
+                      <td className="px-4 py-2 border-b text-gray-600">
+                        {result?.submittedAt}
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-500">No assignment data available</p>
+        )}
+      </div>
     </div>
   );
 };

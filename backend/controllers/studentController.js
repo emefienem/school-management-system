@@ -171,6 +171,13 @@ const studentCtrl = {
           },
           parent: true,
           fees: true,
+          answer: {
+            select: {
+              score: true,
+              submittedAt: true,
+              assignment: true,
+            },
+          },
         },
       });
 
@@ -190,6 +197,58 @@ const studentCtrl = {
       res.status(500).json({ error: err.message });
     }
   },
+
+  // getStudentDetails: async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+
+  //     const student = await prisma.student.findFirst({
+  //       where: { id: parseInt(id) },
+  //       include: {
+  //         school: { select: { schoolName: true } },
+  //         sclass: { select: { sclassName: true } },
+  //         examResults: { include: { subName: { select: { subName: true } } } },
+  //         attendance: {
+  //           select: {
+  //             subName: { select: { subName: true } },
+  //             subNameId: true,
+  //             sessions: true,
+  //             status: true,
+  //             date: true,
+  //             presentCount: true,
+  //             absentCount: true,
+  //           },
+  //         },
+  //         parent: true,
+  //         fees: true,
+  //         answers: {
+  //           include: {
+  //             assignment: { select: { title: true, dueDate: true } },
+  //           },
+  //           select: {
+  //             score: true,
+  //             submittedAt: true,
+  //           },
+  //         },
+  //       },
+  //     });
+
+  //     if (!student) {
+  //       return res.status(404).json({ message: "No student found" });
+  //     }
+
+  //     if (student.disabled) {
+  //       return res
+  //         .status(403)
+  //         .json({ message: "Account is disabled due to unpaid fees" });
+  //     }
+
+  //     const { password, ...studentData } = student;
+  //     return res.json(studentData);
+  //   } catch (err) {
+  //     res.status(500).json({ error: err.message });
+  //   }
+  // },
 
   deleteStudent: async (req, res) => {
     try {

@@ -43,24 +43,6 @@ const classCtrl = {
     }
   },
 
-  // getClassDetail: async (req, res) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const sclass = await prisma.sclass.findUnique({
-  //       where: { id: parseInt(id) },
-  //       include: { school: true },
-  //     });
-
-  //     if (sclass) {
-  //       res.send(sclass);
-  //     } else {
-  //       res.send({ message: "No class found" });
-  //     }
-  //   } catch (err) {
-  //     res.status(500).json(err);
-  //   }
-  // },
-
   getClassDetail: async (req, res) => {
     try {
       const { id } = req.params;
