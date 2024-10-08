@@ -36,13 +36,10 @@ const AddClass: React.FC = () => {
   const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoader(true);
-    const toastId = toast.loading("Adding class....");
     try {
       addStuff(fields, address);
     } catch (error: any) {
       toast.error(error || "An error occurred", { duration: 4000 });
-    } finally {
-      toast.dismiss(toastId);
     }
   };
 
