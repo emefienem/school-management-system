@@ -1,61 +1,213 @@
-import React, { useEffect, useState } from "react";
-import AuthorizedComponent from "./AuthorizedComponent";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/api/useAuth";
+import { useNavigate } from "react-router";
+import { ArrowLeft } from "lucide-react";
 
-const Profile = () => {
-  const { currentUser, currentRole, getFee, fee } = useAuth();
+interface ProfileData {
+  dob: string;
+  age: string | number;
+  height: string | number;
+  weight: string | number;
+  profileImage: string | null;
+}
 
-  const ID = currentUser?.user?.id;
+const Profile: React.FC = () => {
+  const navigate = useNavigate();
+  const { currentUser, currentRole } = useAuth();
+
+  const [profileData, setProfileData] = useState<ProfileData>({
+    dob: "",
+    age: "",
+    height: "",
+    weight: "",
+    profileImage: null,
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (ID) getFee(ID);
-  }, [ID]);
+    const savedProfile = localStorage.getItem(currentUser?.user?.id || "");
+    if (savedProfile) {
+      setProfileData(JSON.parse(savedProfile));
+    }
+  }, [currentUser]);
 
-  const renderFee = () => {
-    if (!fee || fee.length === 0) return <p>No fee structure available.</p>;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfileData({ ...profileData, [name]: value });
+  };
 
-    return (
-      <table className="min-w-full border border-gray-30">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-300 px-4 py-2">Amount</th>
-            <th className="border border-gray-300 px-4 py-2">
-              Duration (months)
-            </th>
-            <th className="border border-gray-300 px-4 py-2">Created At</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fee.map((feeItem, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="border border-gray-300 px-4 py-2 text-center">
-                {feeItem.amount}
-              </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
-                {feeItem.duration}
-              </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
-                {new Date(feeItem.createdAt).toLocaleDateString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileData({ ...profileData, profileImage: reader.result as string });
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setProfileData({ ...profileData, profileImage: null });
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    localStorage.setItem(
+      currentUser?.user?.id || "",
+      JSON.stringify(profileData)
     );
+    alert("Profile updated successfully!");
+    setIsEditing(false);
   };
 
   return (
-    <div>
-      <h2 className="uppercase">{currentRole} profile</h2>
-      <p>{currentUser?.user?.name}</p>
+    <div className="p-6 max-w-lg md:max-w-full mx-auto bg-white shadow-md rounded-lg">
+      <ArrowLeft
+        onClick={() => navigate(-1)}
+        className="bg-blue-500 text-white mb-8"
+      />
+      <h2 className="text-xl font-bold uppercase mb-4 text-center">Profile</h2>
+      <div className="mb-4 flex justify-center">
+        <div className="w-32 h-32 border-4 border-gray-300 rounded-full flex items-center justify-center overflow-hidden">
+          {profileData.profileImage ? (
+            <img
+              src={profileData.profileImage}
+              alt="Profile"
+              className="w-full h-full object-cover rounded-full"
+            />
+          ) : (
+            <span className="text-gray-400">No Image</span>
+          )}
+        </div>
+      </div>
 
-      <AuthorizedComponent roles={["Admin"]}>
-        <button className="bg-orange-500 text-white  px-4 py-2 rounded-lg">
-          <Link to={"/admin/set-fee"}>{fee ? "Set Fee" : "Set New Fee"}</Link>
+      {isEditing && profileData.profileImage && (
+        <button
+          type="button"
+          onClick={handleRemoveImage}
+          className="text-red-500 underline mb-4"
+        >
+          Remove Image
         </button>
-        <div className="mt-10">{renderFee()}</div>
-      </AuthorizedComponent>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label className="block mb-2">Name</label>
+            <input
+              type="text"
+              name="name"
+              value={currentUser?.user?.name || ""}
+              disabled
+              className="w-full border border-gray-300 p-2 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Role</label>
+            <input
+              type="text"
+              name="role"
+              value={currentRole || ""}
+              disabled
+              className="w-full border border-gray-300 p-2 rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block mb-2">School Name</label>
+            <input
+              type="text"
+              name="schoolName"
+              value={currentUser?.user?.schoolName || ""}
+              disabled
+              className="w-full border border-gray-300 p-2 rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2">Date of Birth</label>
+            <input
+              type="date"
+              name="dob"
+              value={profileData.dob}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full border border-gray-300 p-2 rounded-md ${
+                !isEditing ? "bg-gray-100" : ""
+              }`}
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Age</label>
+            <input
+              type="number"
+              name="age"
+              value={profileData.age}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full border border-gray-300 p-2 rounded-md ${
+                !isEditing ? "bg-gray-100" : ""
+              }`}
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Height (cm)</label>
+            <input
+              type="number"
+              name="height"
+              value={profileData.height}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full border border-gray-300 p-2 rounded-md ${
+                !isEditing ? "bg-gray-100" : ""
+              }`}
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Weight (kg)</label>
+            <input
+              type="number"
+              name="weight"
+              value={profileData.weight}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full border border-gray-300 p-2 rounded-md ${
+                !isEditing ? "bg-gray-100" : ""
+              }`}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2">Profile Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              disabled={!isEditing}
+              className="w-full border border-gray-300 p-2 rounded-md"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsEditing(!isEditing)}
+          className="bg-blue-500 text-white mt-6 px-4 py-2 rounded-md hover:bg-blue-600 w-full"
+        >
+          {isEditing ? "Cancel" : "Edit Profile"}
+        </button>
+
+        {isEditing && (
+          <button
+            type="submit"
+            className="bg-green-500 text-white mt-4 px-4 py-2 rounded-md hover:bg-green-600 w-full"
+          >
+            Update Profile
+          </button>
+        )}
+      </form>
     </div>
   );
 };

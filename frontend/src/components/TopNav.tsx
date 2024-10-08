@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { useAuth } from "@/api/useAuth";
 import { Bell, UserIcon } from "lucide-react";
@@ -10,8 +10,16 @@ export const TopNav = () => {
   const { currentRole, currentUser, noticeList } = useAuth();
   const notificationLength = noticeList ? noticeList.length : 0;
 
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
   useEffect(() => {
     console.log(location.pathname);
+
+    const savedProfile = localStorage.getItem(currentUser?.user?.id || "");
+    if (savedProfile) {
+      const parsedProfile = JSON.parse(savedProfile);
+      setProfileImage(parsedProfile.profileImage);
+    }
   }, [location]);
 
   const openNotifications = () => {
@@ -43,7 +51,9 @@ export const TopNav = () => {
 
   return (
     <div className="bg-white shadow-md h-16 p-4 w-full flex items-center justify-between sticky top-0 z-10">
-      <p className="text-lg font-semibold text-gray-800">Dashboard</p>
+      <p className="text-lg font-semibold text-gray-800 opacity-0 md:opacity-100">
+        Dashboard
+      </p>
 
       <div className="flex items-center space-x-4">
         <div
@@ -66,8 +76,19 @@ export const TopNav = () => {
                 {currentRole}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+            {/* <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
               <UserIcon className="w-6 h-6 text-gray-600" />
+            </div> */}
+            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <UserIcon className="w-6 h-6 text-gray-600" />
+              )}
             </div>
           </div>
         </Link>

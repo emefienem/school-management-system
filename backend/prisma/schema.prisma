@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:emefienem@localhost:5432/mydb?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model Admin {
@@ -279,4 +279,12 @@ model Quiz {
   student     Student?   @relation(fields: [studentId], references: [id])
   questions   Question[]
   points      Points[]
+}
+
+model Message {
+  id            Int      @id @default(autoincrement())
+  senderEmail   String
+  receiverEmail String
+  text          String
+  timestamp     DateTime @default(now())
 }

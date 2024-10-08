@@ -32,8 +32,8 @@ export const Signup = () => {
       toast.success("Created account successfully!");
       nav("/login");
     } catch (error: any) {
-      // toast.error(error || "An error occurred");
-      console.error(error);
+      toast.error("This school name exists already ");
+      // console.error(e);
     } finally {
       toast.dismiss(toastId);
     }

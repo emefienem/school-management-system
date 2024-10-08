@@ -39,6 +39,8 @@ interface AuthState {
   totalQuestions: any[];
   quiz: { [key: string]: any };
   optionQuiz: any[];
+  messages: any[];
+  contacts: any[];
   authRequest: () => void;
   authSuccess: (user: any) => void;
   authFailed: (error: string) => void;
@@ -134,6 +136,14 @@ interface AuthState {
     studentId: string
   ) => Promise<void>;
   deleteQuiz: (id: number) => Promise<void>;
+  sendMessage: (
+    senderEmail: string,
+    receiverEmail: string,
+    text: string
+  ) => Promise<void>;
+  createContact: (fields: any) => Promise<void>;
+  getMessage: (id: string, secondId: string) => Promise<void>;
+  getContact: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -174,6 +184,8 @@ export const useAuthStore = create<AuthState>()(
       totalQuestions: [],
       quiz: {},
       optionQuiz: [],
+      messages: [],
+      contacts: [],
       authRequest: () => set({ status: "loading" }),
       authSuccess: (user) => {
         set({
@@ -1153,6 +1165,82 @@ export const useAuthStore = create<AuthState>()(
           }));
 
           return result.data;
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      sendMessage: async (senderEmail, receiverEmail, text) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/message/send`, {
+            senderEmail,
+            receiverEmail,
+            text,
+          });
+
+          set({ loading: false });
+          if (result.data.message) {
+            set({ error: result.data.message, loading: false });
+          } else {
+            set({ response: "Message successfully sent!", loading: false });
+          }
+        } catch (error: any) {
+          set({
+            error: error.message || "Failed to send message",
+            loading: false,
+          });
+        }
+      },
+
+      createContact: async (fields) => {
+        set({ loading: true });
+        try {
+          const result = await axios.post(`${apiUrl}/message/create`, {
+            fields,
+          });
+
+          if (result.data.message) {
+            set({
+              response: result.data.message,
+              loading: false,
+            });
+          } else {
+            set({ response: "Created successfully", loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getMessage: async (id, secondId) => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(`${apiUrl}/message/${id}/${secondId}`);
+
+          if (result.data.message) {
+            set({ error: "No messages found", loading: false });
+          } else {
+            set({ messages: result.data, loading: false });
+          }
+        } catch (error: any) {
+          set({ error: error.message || "Unknown error", loading: false });
+        }
+      },
+
+      getContact: async () => {
+        set({ loading: true });
+        try {
+          const result = await axios.get(`${apiUrl}/message/contacts`);
+
+          if (result.data.message) {
+            set({
+              error: "No contacts found",
+              loading: false,
+            });
+          } else {
+            set({ contacts: result.data, loading: false });
+          }
         } catch (error: any) {
           set({ error: error.message || "Unknown error", loading: false });
         }

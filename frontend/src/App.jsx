@@ -48,6 +48,8 @@ import StudentAssignment from "./components/student/StudentAssignment";
 import TakeQuiz from "./components/student/TakeQuiz";
 import VideoPage from "./components/VideoPage";
 import HomeVideo from "./components/HomeVideo";
+import ContactList from "./components/ContactList";
+import Chat from "./components/Chat";
 
 const App = () => {
   return (
@@ -411,6 +413,22 @@ const App = () => {
             element={
               <ProtectedRoute roles={["Parent"]}>
                 <PayFee />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute roles={["Admin", "teacher", "Parent", "Student"]}>
+                <ContactList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chat/:contactEmail"
+            element={
+              <ProtectedRoute roles={["Admin", "teacher", "Parent", "Student"]}>
+                <Chat />
               </ProtectedRoute>
             }
           />

@@ -85,6 +85,12 @@ export const useAuth = () => {
     getOptionsByQuestionId,
     submitQuiz,
     deleteQuiz,
+    sendMessage,
+    createContact,
+    getMessage,
+    getContact,
+    contacts,
+    messages,
   } = useAuthStore((state) => ({
     register: state.register,
     login: state.login,
@@ -170,6 +176,12 @@ export const useAuth = () => {
     getOptionsByQuestionId: state.getOptionsByQuestionId,
     submitQuiz: state.submitQuiz,
     deleteQuiz: state.deleteQuiz,
+    sendMessage: state.sendMessage,
+    createContact: state.createContact,
+    getMessage: state.getMessage,
+    getContact: state.getContact,
+    contacts: state.contacts,
+    messages: state.messages,
   }));
 
   return {
@@ -256,5 +268,11 @@ export const useAuth = () => {
     getOptionsByQuestionId,
     submitQuiz,
     deleteQuiz,
+    sendMessage,
+    createContact,
+    getMessage,
+    getContact,
+    contacts,
+    messages,
   };
 };

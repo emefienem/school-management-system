@@ -45,7 +45,7 @@ export const Login = () => {
         await login({ email: fields.email, password: fields.password }, role);
       }
     } catch (error: any) {
-      toast.error(error || "An error occurred.", { duration: 4000 });
+      toast.error("Invalid login details. Please confirm!");
       // console.log(error);
     } finally {
       toast.dismiss(toastId);
