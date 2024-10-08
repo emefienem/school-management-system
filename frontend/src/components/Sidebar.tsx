@@ -29,7 +29,8 @@ const SidebarItem = ({
   allowedRoles,
   mainMenu = "abc",
   onClick,
-}: SidebarProps) => {
+  onClose,
+}: SidebarProps & { onClose?: () => void }) => {
   const { currentRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,13 +42,15 @@ const SidebarItem = ({
   const isActive =
     location.pathname.includes(to) || location.pathname.includes(mainMenu);
 
+  const handleClick = async () => {
+    navigate(to);
+    if (onClick) onClick();
+    if (onClose) onClose();
+  };
   return (
     <div
       role="button"
-      onClick={() => {
-        navigate(to);
-        onClick?.();
-      }}
+      onClick={handleClick}
       className={`w-full px-2 text-black flex items-center h-10 my-2 transition-all duration-75 ease-in-out ${
         isActive ? "bg-orange-500 text-white font-bold rounded-xl" : ""
       }`}
@@ -215,147 +218,147 @@ const Sidebar = () => {
               title="Dashboard"
               Icon={LucideLayoutDashboard}
               allowedRoles={["Admin", "teacher", "Parent", "Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/classes"
               title="Classes"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/subjects"
               title="Subjects"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/teachers"
               title="Teachers"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/parents"
               title="Parents"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/students"
               title="Students"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/messages"
               title="Messaging"
               Icon={ClipboardIcon}
               allowedRoles={["Admin", "teacher", "Parent", "Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/notices"
               title="Notices"
               Icon={ClipboardIcon}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/admin/complains"
               title="Complaints"
               Icon={Ticket}
               allowedRoles={["Admin"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/teacher/class"
               title="Class"
               Icon={ClipboardIcon}
               allowedRoles={["teacher"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/room"
               title="Online class"
               Icon={ClipboardIcon}
               allowedRoles={["teacher", "Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/assignment-test"
               title="C.A"
               Icon={ClipboardIcon}
               allowedRoles={["teacher"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/teacher/complain"
               title="Complain"
               Icon={MessageCircle}
               allowedRoles={["teacher"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/student/subjects"
               title="Subjects"
               Icon={ClipboardIcon}
               allowedRoles={["Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/student/enroll"
               title="Enroll"
               Icon={ClipboardIcon}
               allowedRoles={["Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/student/assignment-test"
               title="C.A"
               Icon={ClipboardIcon}
               allowedRoles={["Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/student/attendance"
               title="Attendance"
               Icon={ClipboardIcon}
               allowedRoles={["Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/student/complain"
               title="Complain"
               Icon={MessageCircle}
               allowedRoles={["Student"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/parent/complain"
               title="Complain"
               Icon={MessageCircle}
               allowedRoles={["Parent"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/parent/view-child"
               title="Children"
               Icon={MessageCircle}
               allowedRoles={["Parent"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             <SidebarItem
               to="/parent/pay-fee"
               title="School fees"
               Icon={MessageCircle}
               allowedRoles={["Parent"]}
-              onClick={() => setIsOpen(false)}
+              onClose={() => setIsOpen(false)}
             />
             {accessToken && accessToken !== "access" && (
               <SidebarItem
@@ -363,7 +366,7 @@ const Sidebar = () => {
                 title="Logout"
                 Icon={LogOutIcon}
                 allowedRoles={["Admin", "teacher", "Parent", "Student"]}
-                onClick={() => setIsOpen(false)}
+                onClose={() => setIsOpen(false)}
               />
             )}
           </div>
